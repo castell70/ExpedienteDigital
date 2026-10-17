@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Talent360 Hub — Sistema Integral de Gestión de Personal, Talento y RRHH</title>
+<title>Expediente Digital — Sistema Integral de Gestión de Personal, Talento y RRHH</title>
 <meta name="author" content="Carlos Alfredo Castillo Flores - ITCPO">
 <meta name="description" content="Sistema Integral de Gestión de Personal, Talento y RRHH. Powered by ITCPO">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -69,9 +69,9 @@ tailwind.config = {
            transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out">
     <div class="px-5 py-5 border-b border-white/10">
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-accent-500 grid place-items-center font-black text-lg shadow-lg shadow-accent-500/30">T3</div>
+        <div class="w-11 h-11 rounded-xl bg-accent-500 grid place-items-center font-black text-lg shadow-lg shadow-accent-500/30">ED</div>
         <div class="min-w-0">
-          <h1 class="font-bold text-lg leading-tight truncate">Talent360 Hub</h1>
+          <h1 class="font-bold text-lg leading-tight truncate">Expediente Digital</h1>
           <p class="text-[11px] text-corp-200/80 truncate">Gestión de Personal y Talento</p>
         </div>
       </div>
@@ -128,7 +128,7 @@ tailwind.config = {
 
 <script>
 /* =========================================================================
-   TALENT360 HUB
+   EXPEDIENTE DIGITAL
    Sistema Integral de Gestión de Personal, Talento y RRHH
    © 2026 Carlos Alfredo Castillo Flores — ITCPO
    ========================================================================= */
@@ -271,7 +271,8 @@ function badge(estado) {
 /* =========================================================================
    ARQUITECTURA DE DATOS
    ========================================================================= */
-const DB_KEY = 'talent360hub_db_v1';
+const DB_KEY = 'expedientedigital_db_v1';
+const LEGACY_DB_KEY = 'talent360hub_db_v1';
 
 function defaultDB() {
   return {
@@ -396,7 +397,7 @@ function seedDB() {
         { n: 'Artículo 2', titulo: 'Jornada de trabajo', texto: 'La jornada ordinaria de trabajo es de ocho horas diarias y cuarenta y cuatro horas semanales. El registro de asistencia es obligatorio para todo el personal.' },
         { n: 'Artículo 3', titulo: 'Puntualidad y asistencia', texto: 'El colaborador debe presentarse puntualmente en su puesto de trabajo. Las tardanzas e inasistencias injustificadas serán registradas y podrán dar lugar a las sanciones previstas en este Reglamento.' },
         { n: 'Artículo 4', titulo: 'Vacaciones', texto: 'Todo colaborador que haya cumplido un año de servicio continuo tiene derecho a quince días de vacaciones remuneradas. Las fechas se coordinarán con su jefatura inmediata con al menos quince días de anticipación.' },
-        { n: 'Artículo 5', titulo: 'Permisos', texto: 'Los permisos personales, médicos y licencias especiales deberán solicitarse a través del módulo de Autoservicio del sistema Talent360 Hub y estar debidamente respaldados.' },
+        { n: 'Artículo 5', titulo: 'Permisos', texto: 'Los permisos personales, médicos y licencias especiales deberán solicitarse a través del módulo de Autoservicio del sistema Expediente Digital y estar debidamente respaldados.' },
         { n: 'Artículo 6', titulo: 'Confidencialidad', texto: 'El colaborador se obliga a guardar estricta confidencialidad sobre la información de la empresa y de terceros a la que tenga acceso con motivo de sus funciones, incluso después de terminada la relación laboral.' }
       ],
       conformidades: [{ empleadoId: 'EMP-0001', fecha: '2025-10-05T09:12:00.000Z' }, { empleadoId: 'EMP-0002', fecha: '2025-10-06T14:02:00.000Z' }]
@@ -450,7 +451,16 @@ let DB = null;
 
 function loadDB() {
   try {
-    const raw = localStorage.getItem(DB_KEY);
+    let raw = localStorage.getItem(DB_KEY);
+    // Migración transparente desde la clave anterior (Talent360 Hub)
+    if (!raw) {
+      const legacy = localStorage.getItem(LEGACY_DB_KEY);
+      if (legacy) {
+        raw = legacy;
+        localStorage.setItem(DB_KEY, legacy);
+        localStorage.removeItem(LEGACY_DB_KEY);
+      }
+    }
     if (!raw) return null;
     const d = JSON.parse(raw);
     if (!d || !Array.isArray(d.empleados)) return null;
@@ -1467,8 +1477,8 @@ Juan López,juan@correo.com,+503 7888-1111,Contador,NIIF;SAP,5,Lic. Contaduría,
 function exportarJSON() {
   log('RESPALDO_EXPORTADO', 'Se exportó la base de datos completa en formato JSON.');
   saveDB();
-  const payload = { ...DB, meta: { ...DB.meta, exportado: new Date().toISOString(), sistema: 'Talent360 Hub', autor: 'Carlos Alfredo Castillo Flores - ITCPO' } };
-  download(`Talent360Hub_backup_${hoy()}.json`, JSON.stringify(payload, null, 2));
+  const payload = { ...DB, meta: { ...DB.meta, exportado: new Date().toISOString(), sistema: 'Expediente Digital', autor: 'Carlos Alfredo Castillo Flores - ITCPO' } };
+  download(`ExpedienteDigital_backup_${hoy()}.json`, JSON.stringify(payload, null, 2));
   toast('Respaldo JSON exportado correctamente.', 'ok');
   render();
 }
@@ -1556,7 +1566,7 @@ function exportarEmpleadosCSV() {
     (e.competencias || []).map(c => `${c.nombre}(${c.nivel})`).join('; '),
     (e.capacitaciones || []).map(c => c.nombre).join('; ')
   ]);
-  download(`Talent360_Empleados_${hoy()}.csv`, toCSV(headers, rows), 'text/csv');
+  download(`ExpedienteDigital_Empleados_${hoy()}.csv`, toCSV(headers, rows), 'text/csv');
   log('EXPORT_CSV', `Se exportaron ${rows.length} empleados a CSV.`);
   saveDB(); render();
   toast('Listado de empleados exportado en CSV.', 'ok');
@@ -1568,7 +1578,7 @@ function exportarSolicitudesCSV() {
     s.id, s.empleadoId, nombreEmp(s.empleadoId), s.tipo, s.fechaInicio, s.fechaFin, s.dias,
     s.estado, s.fechaSolicitud, s.resueltoPor || '', s.motivo || '', s.comentario || ''
   ]);
-  download(`Talent360_Solicitudes_${hoy()}.csv`, toCSV(headers, rows), 'text/csv');
+  download(`ExpedienteDigital_Solicitudes_${hoy()}.csv`, toCSV(headers, rows), 'text/csv');
   log('EXPORT_CSV', `Se exportaron ${rows.length} solicitudes a CSV.`);
   saveDB(); render();
   toast('Listado de solicitudes exportado en CSV.', 'ok');
@@ -1757,7 +1767,7 @@ function viewAyuda() {
       <h3 class="font-bold text-slate-800 mb-4">Preguntas frecuentes</h3>
       <div class="space-y-3">
         ${faq('¿Dónde se almacena la información?',
-          'Todos los datos se guardan en el <strong>almacenamiento local del navegador</strong> (localStorage) bajo la clave <code class="bg-slate-100 px-1.5 py-0.5 rounded text-xs">talent360hub_db_v1</code>. No se envía información a servidores externos. Si limpia los datos del navegador, la información se perderá: por ello se recomienda exportar respaldos JSON periódicamente.')}
+          'Todos los datos se guardan en el <strong>almacenamiento local del navegador</strong> (localStorage) bajo la clave <code class="bg-slate-100 px-1.5 py-0.5 rounded text-xs">expedientedigital_db_v1</code>. No se envía información a servidores externos. Si limpia los datos del navegador, la información se perderá: por ello se recomienda exportar respaldos JSON periódicamente.')}
         ${faq('¿Qué formatos de documento acepta el expediente?',
           'PDF e imágenes (JPG, PNG y WEBP). Los archivos de hasta 2 MB se almacenan íntegramente y permiten previsualización y descarga. Los archivos mayores conservan únicamente sus metadatos para no agotar el almacenamiento local.')}
         ${faq('¿Cómo funciona el flujo de aprobación de solicitudes?',
@@ -1788,7 +1798,7 @@ function viewAyuda() {
       <div class="bg-white rounded-xl border border-slate-200 p-6">
         <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">${icon('doc','w-5 h-5 text-accent-500')} Términos de servicio</h3>
         <ol class="space-y-3 text-sm text-slate-600 leading-relaxed list-decimal list-inside">
-          <li><strong>Aceptación.</strong> El uso de Talent360 Hub implica la aceptación plena de estos términos por parte de la organización usuaria y de las personas autorizadas.</li>
+          <li><strong>Aceptación.</strong> El uso de Expediente Digital implica la aceptación plena de estos términos por parte de la organización usuaria y de las personas autorizadas.</li>
           <li><strong>Licencia de uso.</strong> Se concede una licencia de uso interna, no exclusiva e intransferible, limitada a las operaciones de gestión de personal de la organización.</li>
           <li><strong>Uso autorizado.</strong> El acceso está restringido al personal de Recursos Humanos y a las jefaturas debidamente autorizadas. Las credenciales son personales e intransferibles.</li>
           <li><strong>Responsabilidad del usuario.</strong> El usuario es responsable de la veracidad de los datos que registra y del uso conforme a la ley que haga de la herramienta.</li>
@@ -1821,9 +1831,9 @@ function viewAyuda() {
     <!-- Derechos de autor -->
     <div class="bg-gradient-to-r from-corp-800 to-corp-900 rounded-xl p-6 text-white">
       <div class="flex flex-col md:flex-row items-start md:items-center gap-5">
-        <div class="w-16 h-16 rounded-2xl bg-accent-500 grid place-items-center font-black text-2xl shrink-0">T3</div>
+        <div class="w-16 h-16 rounded-2xl bg-accent-500 grid place-items-center font-black text-2xl shrink-0">ED</div>
         <div class="flex-1">
-          <h3 class="font-bold text-lg">Talent360 Hub — Sistema Integral de Gestión de Personal, Talento y RRHH</h3>
+          <h3 class="font-bold text-lg">Expediente Digital — Sistema Integral de Gestión de Personal, Talento y RRHH</h3>
           <p class="text-sm text-corp-100/90 mt-1">© 2026 <strong>Carlos Alfredo Castillo Flores</strong> — ITCPO. Todos los derechos reservados.</p>
           <p class="text-xs text-corp-200/70 mt-2 leading-relaxed">Queda prohibida la reproducción, distribución, comunicación pública o transformación total o parcial de este software sin la autorización expresa y por escrito del titular de los derechos. El uso no autorizado podrá dar lugar a las responsabilidades civiles y penales previstas en la legislación aplicable en materia de propiedad intelectual.</p>
           <p class="text-xs font-bold text-accent-400 mt-3 powered inline-block">Powered by ITCPO</p>
@@ -2223,7 +2233,7 @@ const ACTIONS = {
   exportCSVsol: () => exportarSolicitudesCSV(),
   exportLog: () => {
     const headers = ['fecha','usuario','accion','detalle'];
-    download(`Talent360_Auditoria_${hoy()}.csv`, toCSV(headers, DB.auditoria.map(l => [l.fecha, l.usuario, l.accion, l.detalle])), 'text/csv');
+    download(`ExpedienteDigital_Auditoria_${hoy()}.csv`, toCSV(headers, DB.auditoria.map(l => [l.fecha, l.usuario, l.accion, l.detalle])), 'text/csv');
     toast('Bitácora exportada.', 'ok');
   },
   resetDB: () => {
@@ -2494,10 +2504,10 @@ $('#overlay').addEventListener('click', closeSidebar);
   if (!DB) {
     DB = seedDB();
     saveDB();
-    setTimeout(() => toast('Bienvenido a Talent360 Hub. Se cargaron datos de demostración.', 'info'), 600);
+    setTimeout(() => toast('Bienvenido a Expediente Digital. Se cargaron datos de demostración.', 'info'), 600);
   }
   render();
-  console.log('%cTalent360 Hub','color:#f97316;font-weight:bold;font-size:14px','\n© 2026 Carlos Alfredo Castillo Flores — ITCPO. Todos los derechos reservados.');
+  console.log('%cExpediente Digital','color:#f97316;font-weight:bold;font-size:14px','\n© 2026 Carlos Alfredo Castillo Flores — ITCPO. Todos los derechos reservados.');
 })();
 </script>
 </body>
