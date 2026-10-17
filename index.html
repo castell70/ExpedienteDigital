@@ -1,97 +1,2504 @@
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Talent360 Hub - Sistema Integral de Gestión de RRHH</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <style>
-      /* 内联样式确保主题色立即生效，避免闪烁 */
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-      }
-      html.light,
-      html.light body {
-        background-color: #ffffff !important;
-        color: #000000;
-      }
-      html.dark,
-      html.dark body {
-        background-color: #1a1a1a !important;
-        color: #ffffff;
-      }
-    </style>
-    <script>
-      // 在 React 加载前立即设置主题，避免闪烁
-      (function () {
-        const isInIframe = window.self !== window.top;
-
-        function applyThemeToDOM(theme) {
-          document.documentElement.classList.remove("light", "dark");
-          document.documentElement.classList.add(theme);
-          document.documentElement.setAttribute("data-theme", theme);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talent360 Hub — Sistema Integral de Gestión de Personal, Talento y RRHH</title>
+<meta name="author" content="Carlos Alfredo Castillo Flores - ITCPO">
+<meta name="description" content="Sistema Integral de Gestión de Personal, Talento y RRHH. Powered by ITCPO">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        corp: {
+          50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
+          500:'#3b82f6',600:'#1e40af',700:'#1e3a8a',800:'#172554',900:'#0b1220'
+        },
+        accent: {
+          50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',
+          500:'#f97316',600:'#ea580c',700:'#c2410c'
         }
+      },
+      fontFamily: { sans: ['Inter','Segoe UI','system-ui','sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  html,body{height:100%}
+  body{font-family:Inter,'Segoe UI',system-ui,sans-serif}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px;border:2px solid transparent;background-clip:content-box}
+  ::-webkit-scrollbar-thumb:hover{background:#94a3b8;background-clip:content-box}
 
-        if (isInIframe) {
-          // 监听父窗口主动推送的主题消息
-          window.addEventListener("message", function (event) {
-            if (event.data && typeof event.data.theme === "string") {
-              const theme = event.data.theme;
-              if (theme === "light" || theme === "dark") {
-                applyThemeToDOM(theme);
-              }
-            }
-          });
-        } else {
-          // 非 iframe 环境，使用默认 light 主题
-          applyThemeToDOM("light");
-        }
-      })();
-    </script>
-      <script>
-      (function () {
-        if (window.self === window.top) return;
-        var reported = {};
-        window.addEventListener("error", function (event) {
-          // 资源加载失败的 error 事件没有 message，此处仅上报 JS 运行时错误
-          if (!event || !event.message) return;
-          var key =
-            event.message + "|" + (event.filename || "") + "|" + (event.lineno || 0);
-          if (reported[key]) return; // 相同错误只上报一次，避免渲染循环刷屏
-          reported[key] = true;
-          try {
-            window.parent.postMessage(
-              {
-                type: "sandbox-runtime-error",
-                payload: {
-                  message: String(event.message).slice(0, 500),
-                  filename: event.filename || "",
-                  lineno: event.lineno || 0,
-                  colno: event.colno || 0,
-                  stack:
-                    event.error && event.error.stack
-                      ? String(event.error.stack).slice(0, 2000)
-                      : ""
-                }
-              },
-              "*"
-            );
-          } catch (e) {
-            /* 上报失败不影响页面运行 */
-          }
-        });
-      })();
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  /* === Animación de encendido y apagado lento para "Powered by ITCPO" === */
+  @keyframes poweredPulse{
+    0%,100%{ opacity:1; text-shadow:0 0 10px rgba(249,115,22,.95), 0 0 22px rgba(249,115,22,.45); }
+    50%    { opacity:.22; text-shadow:0 0 0 rgba(249,115,22,0); }
+  }
+  .powered{
+    text-align:right;
+    animation:poweredPulse 6s ease-in-out infinite;
+  }
+
+  @keyframes pop{ from{opacity:0; transform:translateY(8px) scale(.98)} to{opacity:1; transform:none} }
+  .animate-pop{animation:pop .18s ease-out}
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+  .fade-in{animation:fadeIn .22s ease-out}
+  @keyframes toastIn{ from{opacity:0; transform:translateX(30px)} to{opacity:1; transform:none} }
+  .toast-in{animation:toastIn .25s ease-out}
+
+  .nav-item.active{ background:rgba(249,115,22,.15); color:#fff; border-left-color:#f97316 }
+  .nav-item{ border-left:3px solid transparent }
+
+  .doc-drop.dragover{ border-color:#f97316; background:#fff7ed }
+
+  @media print{ .no-print{display:none!important} }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+<div class="flex h-screen overflow-hidden">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside id="sidebar"
+    class="fixed lg:static z-40 inset-y-0 left-0 w-72 shrink-0 bg-gradient-to-b from-corp-800 to-corp-900 text-white flex flex-col
+           transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out">
+    <div class="px-5 py-5 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-accent-500 grid place-items-center font-black text-lg shadow-lg shadow-accent-500/30">T3</div>
+        <div class="min-w-0">
+          <h1 class="font-bold text-lg leading-tight truncate">Talent360 Hub</h1>
+          <p class="text-[11px] text-corp-200/80 truncate">Gestión de Personal y Talento</p>
+        </div>
+      </div>
+    </div>
+
+    <nav id="nav" class="flex-1 overflow-y-auto py-4 px-3 space-y-1"></nav>
+
+    <div class="p-4 border-t border-white/10 text-[11px] text-corp-200/70 leading-relaxed">
+      <p class="font-semibold text-white/90">© 2026 Carlos Alfredo Castillo Flores</p>
+      <p>ITCPO · Todos los derechos reservados</p>
+    </div>
+  </aside>
+
+  <div id="overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
+
+  <!-- ================= CONTENIDO ================= -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <header class="no-print bg-white border-b border-slate-200 px-4 lg:px-6 h-16 flex items-center gap-4 shadow-sm shrink-0">
+      <button id="btnMenu" class="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600" aria-label="Menú">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <div class="min-w-0 flex-1">
+        <h2 id="viewTitle" class="font-bold text-slate-800 truncate leading-tight">Expediente Digital</h2>
+        <p id="viewSub" class="text-xs text-slate-500 truncate">Perfil 360° del empleado</p>
+      </div>
+
+      <div class="hidden sm:flex flex-col items-end">
+        <span class="powered text-sm font-extrabold tracking-wider text-accent-600 select-none">Powered by ITCPO</span>
+      </div>
+    </header>
+
+    <main id="main" class="flex-1 overflow-y-auto p-4 lg:p-6"></main>
+  </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div id="modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" data-act="closeModal"></div>
+  <div class="relative h-full flex items-center justify-center p-4 pointer-events-none">
+    <div id="modalBox" class="pointer-events-auto bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-pop">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 shrink-0">
+        <h3 id="modalTitle" class="font-bold text-slate-800 truncate"></h3>
+        <button data-act="closeModal" class="text-slate-400 hover:text-slate-700 text-2xl leading-none px-1">&times;</button>
+      </div>
+      <div id="modalBody" class="p-5 overflow-y-auto flex-1"></div>
+      <div id="modalFooter" class="px-5 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-end gap-2 shrink-0"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" class="fixed bottom-5 right-5 z-[60] space-y-2 w-80 max-w-[90vw]"></div>
+
+<script>
+/* =========================================================================
+   TALENT360 HUB
+   Sistema Integral de Gestión de Personal, Talento y RRHH
+   © 2026 Carlos Alfredo Castillo Flores — ITCPO
+   ========================================================================= */
+
+/* ------------------------------ UTILIDADES ------------------------------ */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const uid = (p = 'ID') => `${p}-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+const esc = (s = '') => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const hoy = () => new Date().toISOString().slice(0, 10);
+const v   = id => (document.getElementById(id)?.value || '').trim();
+const num = id => parseFloat(document.getElementById(id)?.value || '0') || 0;
+
+function fmt(iso) {
+  if (!iso) return '—';
+  const d = new Date(String(iso).length > 10 ? iso : iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('es-SV', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function fmtDT(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleString('es-SV', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function diasEntre(a, b) {
+  if (!a || !b) return 0;
+  const d1 = new Date(a), d2 = new Date(b);
+  if (isNaN(d1) || isNaN(d2) || d2 < d1) return 0;
+  return Math.round((d2 - d1) / 86400000) + 1;
+}
+function initials(n = '') {
+  return n.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+}
+function avatarColor(str = '') {
+  const c = ['bg-corp-600','bg-emerald-600','bg-violet-600','bg-rose-600','bg-amber-600','bg-teal-600','bg-indigo-600','bg-cyan-600'];
+  let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return c[h % c.length];
+}
+function bytes(n) {
+  if (!n && n !== 0) return '—';
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1048576).toFixed(2) + ' MB';
+}
+function readAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(file);
+  });
+}
+function download(filename, content, mime = 'application/json') {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 400);
+}
+
+/* ------------------------------ TOASTS ------------------------------ */
+function toast(msg, tipo = 'ok') {
+  const styles = {
+    ok:   'bg-emerald-600',
+    err:  'bg-rose-600',
+    warn: 'bg-amber-500',
+    info: 'bg-corp-600'
+  };
+  const icons = { ok: '✓', err: '✕', warn: '!', info: 'i' };
+  const el = document.createElement('div');
+  el.className = `toast-in ${styles[tipo] || styles.ok} text-white text-sm rounded-xl shadow-lg px-4 py-3 flex items-start gap-3`;
+  el.innerHTML = `<span class="font-bold">${icons[tipo] || '✓'}</span><span class="flex-1">${esc(msg)}</span>`;
+  $('#toasts').appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity .35s, transform .35s';
+    el.style.opacity = '0'; el.style.transform = 'translateX(30px)';
+    setTimeout(() => el.remove(), 350);
+  }, 3600);
+}
+
+/* ------------------------------ MODAL ------------------------------ */
+function openModal({ title = '', body = '', footer = '', size = 'max-w-2xl' }) {
+  $('#modalTitle').innerHTML = title;
+  $('#modalBody').innerHTML = body;
+  $('#modalFooter').innerHTML = footer;
+  $('#modalBox').className = `pointer-events-auto bg-white rounded-2xl shadow-2xl w-full ${size} max-h-[92vh] flex flex-col overflow-hidden animate-pop`;
+  $('#modal').classList.remove('hidden');
+}
+function closeModal() { $('#modal').classList.add('hidden'); $('#modalBody').innerHTML = ''; $('#modalFooter').innerHTML = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ------------------------------ ICONOS ------------------------------ */
+const ICONS = {
+  user:  '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  book:  '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  tool:  '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  help:  '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  plus:  '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  back:  '<path d="m15 18-6-6 6-6"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  edit:  '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/>',
+  eye:   '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  down:  '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  up:    '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  x:     '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  doc:   '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  award: '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+  chart: '<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+};
+function icon(name, cls = 'w-5 h-5') {
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+}
+
+/* ------------------------------ BADGES ------------------------------ */
+const BADGE_MAP = {
+  'Aprobado':   'bg-emerald-100 text-emerald-700 ring-emerald-200',
+  'Activo':     'bg-emerald-100 text-emerald-700 ring-emerald-200',
+  'Contratado': 'bg-emerald-100 text-emerald-700 ring-emerald-200',
+  'Vigente':    'bg-emerald-100 text-emerald-700 ring-emerald-200',
+  'Pendiente':  'bg-amber-100 text-amber-700 ring-amber-200',
+  'En Revisión':'bg-amber-100 text-amber-700 ring-amber-200',
+  'Entrevista': 'bg-sky-100 text-sky-700 ring-sky-200',
+  'Rechazado':  'bg-rose-100 text-rose-700 ring-rose-200',
+  'Descartado': 'bg-rose-100 text-rose-700 ring-rose-200',
+  'Inactivo':   'bg-slate-100 text-slate-600 ring-slate-200',
+  'Cerrado':    'bg-slate-100 text-slate-600 ring-slate-200'
+};
+function badge(estado) {
+  const cls = BADGE_MAP[estado] || 'bg-slate-100 text-slate-600 ring-slate-200';
+  return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ring-1 ${cls} whitespace-nowrap">${esc(estado)}</span>`;
+}
+
+/* =========================================================================
+   ARQUITECTURA DE DATOS
+   ========================================================================= */
+const DB_KEY = 'talent360hub_db_v1';
+
+function defaultDB() {
+  return {
+    meta: { version: '1.0.0', creado: hoy(), actualizado: new Date().toISOString(), autor: 'Carlos Alfredo Castillo Flores - ITCPO' },
+    empleados: [],
+    solicitudes: [],
+    candidatos: [],
+    politicas: [],
+    auditoria: []
+  };
+}
+
+function seedDB() {
+  const db = defaultDB();
+
+  const comp = (n, l) => ({ nombre: n, nivel: l });
+
+  db.empleados = [
+    {
+      id: 'EMP-0001', nombre: 'Ana Lucía', apellidos: 'Morales Vega',
+      email: 'ana.morales@itcpo.com', telefono: '+503 7788-1122',
+      fechaNacimiento: '1990-04-12', genero: 'Femenino',
+      dui: '0456-120490-101-1', nit: '0614-120490-101-1',
+      direccion: 'Col. Escalón, San Salvador', nivelAcademico: 'Lic. en Psicología',
+      departamento: 'Recursos Humanos', puesto: 'Jefa de Talento Humano', jefe: 'Carlos A. Castillo',
+      fechaIngreso: '2018-03-01', tipoContrato: 'Indefinido', salario: 1850, estado: 'Activo',
+      vacacionesAsignadas: 15, vacacionesTomadas: 5,
+      documentos: [
+        { id: 'DOC-D1', nombre: 'CV_Ana_Morales.pdf', tipo: 'application/pdf', size: 284500, fecha: '2024-01-15', data: null, demo: true },
+        { id: 'DOC-D2', nombre: 'Diploma_Psicologia.jpg', tipo: 'image/jpeg', size: 912000, fecha: '2023-11-02', data: null, demo: true }
+      ],
+      capacitaciones: [
+        { id: 'CAP-1', nombre: 'Gestión del Talento por Competencias', institucion: 'INCAE', fecha: '2024-06-10', horas: 40, estado: 'Completado' },
+        { id: 'CAP-2', nombre: 'Ley de Protección de Datos Personales', institucion: 'ITCPO Academy', fecha: '2025-02-18', horas: 12, estado: 'Completado' }
+      ],
+      competencias: [comp('Liderazgo', 5), comp('Comunicación efectiva', 5), comp('Gestión de conflictos', 4), comp('Excel avanzado', 4)]
+    },
+    {
+      id: 'EMP-0002', nombre: 'Carlos Eduardo', apellidos: 'Ramírez Solís',
+      email: 'carlos.ramirez@itcpo.com', telefono: '+503 7012-8890',
+      fechaNacimiento: '1993-09-25', genero: 'Masculino',
+      dui: '0512-250993-102-3', nit: '0614-250993-102-3',
+      direccion: 'Res. Santa Tecla, La Libertad', nivelAcademico: 'Ing. en Sistemas',
+      departamento: 'Tecnología', puesto: 'Desarrollador Senior', jefe: 'Marta Rivas',
+      fechaIngreso: '2020-07-16', tipoContrato: 'Indefinido', salario: 2100, estado: 'Activo',
+      vacacionesAsignadas: 15, vacacionesTomadas: 9,
+      documentos: [{ id: 'DOC-D3', nombre: 'Certificacion_AWS_CloudPractitioner.pdf', tipo: 'application/pdf', size: 412000, fecha: '2024-09-01', data: null, demo: true }],
+      capacitaciones: [
+        { id: 'CAP-3', nombre: 'Arquitectura de Microservicios', institucion: 'Platzi', fecha: '2024-03-22', horas: 30, estado: 'Completado' },
+        { id: 'CAP-4', nombre: 'Seguridad en Aplicaciones Web', institucion: 'OWASP Foundation', fecha: '2025-01-30', horas: 20, estado: 'Completado' }
+      ],
+      competencias: [comp('JavaScript', 5), comp('Node.js', 5), comp('SQL', 4), comp('Liderazgo técnico', 4), comp('Docker', 4)]
+    },
+    {
+      id: 'EMP-0003', nombre: 'María José', apellidos: 'Hernández Cruz',
+      email: 'maria.hernandez@itcpo.com', telefono: '+503 7655-4411',
+      fechaNacimiento: '1996-01-08', genero: 'Femenino',
+      dui: '0398-080196-103-7', nit: '0614-080196-103-7',
+      direccion: 'Col. Layco, San Salvador', nivelAcademico: 'Lic. en Contaduría Pública',
+      departamento: 'Finanzas', puesto: 'Analista Contable', jefe: 'Roberto Cano',
+      fechaIngreso: '2021-02-01', tipoContrato: 'Indefinido', salario: 1250, estado: 'Activo',
+      vacacionesAsignadas: 15, vacacionesTomadas: 3,
+      documentos: [{ id: 'DOC-D4', nombre: 'Titulo_Contaduria.jpg', tipo: 'image/jpeg', size: 640000, fecha: '2021-01-20', data: null, demo: true }],
+      capacitaciones: [{ id: 'CAP-5', nombre: 'NIIF para PYMES', institucion: 'Cámara de Comercio', fecha: '2024-08-05', horas: 24, estado: 'Completado' }],
+      competencias: [comp('Análisis financiero', 4), comp('Excel avanzado', 5), comp('Atención al detalle', 5), comp('SAP FI', 3)]
+    },
+    {
+      id: 'EMP-0004', nombre: 'José Antonio', apellidos: 'Peña Linares',
+      email: 'jose.pena@itcpo.com', telefono: '+503 7899-2233',
+      fechaNacimiento: '1988-11-30', genero: 'Masculino',
+      dui: '0231-301188-104-2', nit: '0614-301188-104-2',
+      direccion: 'Soyapango, San Salvador', nivelAcademico: 'Técnico en Logística',
+      departamento: 'Operaciones', puesto: 'Supervisor de Logística', jefe: 'Karla Bonilla',
+      fechaIngreso: '2017-05-22', tipoContrato: 'Indefinido', salario: 1100, estado: 'Activo',
+      vacacionesAsignadas: 18, vacacionesTomadas: 12,
+      documentos: [],
+      capacitaciones: [
+        { id: 'CAP-6', nombre: 'Manejo de Inventarios WMS', institucion: 'ITCPO Academy', fecha: '2023-10-12', horas: 16, estado: 'Completado' },
+        { id: 'CAP-7', nombre: 'Seguridad y Salud Ocupacional', institucion: 'Ministerio de Trabajo', fecha: '2025-03-04', horas: 8, estado: 'Completado' }
+      ],
+      competencias: [comp('Gestión de equipos', 4), comp('Control de inventarios', 5), comp('Manejo de montacargas', 5), comp('Negociación', 3)]
+    },
+    {
+      id: 'EMP-0005', nombre: 'Sofía Beatriz', apellidos: 'Aguilar Ortiz',
+      email: 'sofia.aguilar@itcpo.com', telefono: '+503 7123-9087',
+      fechaNacimiento: '1998-06-17', genero: 'Femenino',
+      dui: '0677-170698-105-9', nit: '0614-170698-105-9',
+      direccion: 'Antiguo Cuscatlán, La Libertad', nivelAcademico: 'Lic. en Comunicaciones',
+      departamento: 'Marketing', puesto: 'Especialista en Comunicaciones', jefe: 'Andrea Mejía',
+      fechaIngreso: '2022-09-05', tipoContrato: 'Indefinido', salario: 1150, estado: 'Activo',
+      vacacionesAsignadas: 15, vacacionesTomadas: 6,
+      documentos: [],
+      capacitaciones: [{ id: 'CAP-8', nombre: 'Marketing Digital y SEO', institucion: 'Google Actívate', fecha: '2024-11-11', horas: 20, estado: 'Completado' }],
+      competencias: [comp('Redacción corporativa', 5), comp('Diseño gráfico', 4), comp('SEO/SEM', 4), comp('Adobe Suite', 4)]
+    }
+  ];
+
+  db.solicitudes = [
+    { id: 'SOL-0001', empleadoId: 'EMP-0001', tipo: 'Vacaciones', fechaInicio: '2026-01-12', fechaFin: '2026-01-16', dias: 5, motivo: 'Viaje familiar programado.', estado: 'Aprobado', fechaSolicitud: '2025-12-20', resueltoPor: 'Carlos A. Castillo', comentario: 'Aprobado según disponibilidad del departamento.' },
+    { id: 'SOL-0002', empleadoId: 'EMP-0002', tipo: 'Permiso personal', fechaInicio: '2026-02-03', fechaFin: '2026-02-03', dias: 1, motivo: 'Trámites personales en Registro Público.', estado: 'Pendiente', fechaSolicitud: '2026-01-28', resueltoPor: '', comentario: '' },
+    { id: 'SOL-0003', empleadoId: 'EMP-0004', tipo: 'Permiso médico', fechaInicio: '2025-12-11', fechaFin: '2025-12-12', dias: 2, motivo: 'Incapacidad médica respaldada con constancia.', estado: 'Aprobado', fechaSolicitud: '2025-12-10', resueltoPor: 'Ana L. Morales', comentario: 'Se adjuntó constancia médica.' },
+    { id: 'SOL-0004', empleadoId: 'EMP-0003', tipo: 'Vacaciones', fechaInicio: '2026-03-02', fechaFin: '2026-03-06', dias: 5, motivo: 'Descanso anual.', estado: 'Rechazado', fechaSolicitud: '2026-02-10', resueltoPor: 'Roberto Cano', comentario: 'Coincide con cierre contable trimestral.' },
+    { id: 'SOL-0005', empleadoId: 'EMP-0005', tipo: 'Licencia especial', fechaInicio: '2026-02-20', fechaFin: '2026-02-21', dias: 2, motivo: 'Participación en congreso de comunicaciones.', estado: 'Pendiente', fechaSolicitud: '2026-02-01', resueltoPor: '', comentario: '' },
+    { id: 'SOL-0006', empleadoId: 'EMP-0002', tipo: 'Otros', fechaInicio: '2026-01-05', fechaFin: '2026-01-05', dias: 1, motivo: 'Teletrabajo por instalación de servicios.', estado: 'Aprobado', fechaSolicitud: '2026-01-03', resueltoPor: 'Marta Rivas', comentario: 'Autorizado.' }
+  ];
+
+  db.candidatos = [
+    { id: 'CAN-0001', nombre: 'Roberto Carlos Méndez Ayala', email: 'rcmendez@correo.com', telefono: '+503 7012-3344', puesto: 'Analista de Datos', fuente: 'LinkedIn', estado: 'En Revisión', habilidades: ['SQL','Power BI','Python'], experiencia: 4, educacion: 'Ing. en Sistemas', cvNombre: 'CV_Roberto_Mendez.pdf', fechaRegistro: '2026-01-14', notas: '' },
+    { id: 'CAN-0002', nombre: 'Karen Patricia Nolasco Reyes', email: 'kpnolasco@correo.com', telefono: '+503 7788-2211', puesto: 'Desarrollador Frontend', fuente: 'Portal Web', estado: 'Entrevista', habilidades: ['JavaScript','React','Tailwind CSS'], experiencia: 3, educacion: 'Ing. en Computación', cvNombre: 'CV_Karen_Nolasco.pdf', fechaRegistro: '2026-01-09', notas: 'Entrevista técnica agendada.' },
+    { id: 'CAN-0003', nombre: 'Luis Fernando Escobar Díaz', email: 'lfescobar@correo.com', telefono: '+503 7654-1199', puesto: 'Contador Junior', fuente: 'Referido interno', estado: 'Contratado', habilidades: ['Contabilidad','Excel','SAP FI'], experiencia: 2, educacion: 'Lic. en Contaduría', cvNombre: 'CV_Luis_Escobar.pdf', fechaRegistro: '2025-12-02', notas: 'Ingreso programado.' },
+    { id: 'CAN-0004', nombre: 'Gabriela Alejandra Sosa Mejía', email: 'gasosa@correo.com', telefono: '+503 7123-4455', puesto: 'Especialista en Marketing', fuente: 'LinkedIn', estado: 'Descartado', habilidades: ['SEO','Redes Sociales'], experiencia: 5, educacion: 'Lic. en Mercadeo', cvNombre: 'CV_Gabriela_Sosa.pdf', fechaRegistro: '2025-11-18', notas: 'Pretensión salarial fuera de rango.' },
+    { id: 'CAN-0005', nombre: 'Diego Armando Fuentes Rivera', email: 'dafuentes@correo.com', telefono: '+503 7890-6633', puesto: 'Supervisor de Bodega', fuente: 'Feria de empleo', estado: 'En Revisión', habilidades: ['Inventarios','WMS','Liderazgo'], experiencia: 7, educacion: 'Técnico en Logística', cvNombre: 'CV_Diego_Fuentes.pdf', fechaRegistro: '2026-01-22', notas: '' },
+    { id: 'CAN-0006', nombre: 'Andrea Sofía Villalta Cruz', email: 'asvillalta@correo.com', telefono: '+503 7456-8899', puesto: 'Analista de RRHH', fuente: 'Portal Web', estado: 'Entrevista', habilidades: ['Reclutamiento','Nómina','Excel'], experiencia: 4, educacion: 'Lic. en Psicología', cvNombre: 'CV_Andrea_Villalta.pdf', fechaRegistro: '2026-01-27', notas: 'Buen desempeño en prueba psicométrica.' }
+  ];
+
+  db.politicas = [
+    {
+      id: 'POL-001', titulo: 'Reglamento Interno de Trabajo', categoria: 'Normativa laboral', version: 'v4.2',
+      fechaActualizacion: '2025-10-01', obligatoria: true,
+      articulos: [
+        { n: 'Artículo 1', titulo: 'Objeto', texto: 'El presente Reglamento tiene por objeto regular las condiciones de trabajo, los derechos y las obligaciones recíprocas entre la empresa y sus colaboradores, en cumplimiento del Código de Trabajo vigente.' },
+        { n: 'Artículo 2', titulo: 'Jornada de trabajo', texto: 'La jornada ordinaria de trabajo es de ocho horas diarias y cuarenta y cuatro horas semanales. El registro de asistencia es obligatorio para todo el personal.' },
+        { n: 'Artículo 3', titulo: 'Puntualidad y asistencia', texto: 'El colaborador debe presentarse puntualmente en su puesto de trabajo. Las tardanzas e inasistencias injustificadas serán registradas y podrán dar lugar a las sanciones previstas en este Reglamento.' },
+        { n: 'Artículo 4', titulo: 'Vacaciones', texto: 'Todo colaborador que haya cumplido un año de servicio continuo tiene derecho a quince días de vacaciones remuneradas. Las fechas se coordinarán con su jefatura inmediata con al menos quince días de anticipación.' },
+        { n: 'Artículo 5', titulo: 'Permisos', texto: 'Los permisos personales, médicos y licencias especiales deberán solicitarse a través del módulo de Autoservicio del sistema Talent360 Hub y estar debidamente respaldados.' },
+        { n: 'Artículo 6', titulo: 'Confidencialidad', texto: 'El colaborador se obliga a guardar estricta confidencialidad sobre la información de la empresa y de terceros a la que tenga acceso con motivo de sus funciones, incluso después de terminada la relación laboral.' }
+      ],
+      conformidades: [{ empleadoId: 'EMP-0001', fecha: '2025-10-05T09:12:00.000Z' }, { empleadoId: 'EMP-0002', fecha: '2025-10-06T14:02:00.000Z' }]
+    },
+    {
+      id: 'POL-002', titulo: 'Código de Ética y Conducta', categoria: 'Ética corporativa', version: 'v2.0',
+      fechaActualizacion: '2025-08-15', obligatoria: true,
+      articulos: [
+        { n: 'Artículo 1', titulo: 'Principios rectores', texto: 'Todas las actuaciones del personal se regirán por los principios de integridad, transparencia, respeto, responsabilidad y legalidad.' },
+        { n: 'Artículo 2', titulo: 'Conflicto de intereses', texto: 'El colaborador debe declarar cualquier situación que pueda comprometer su imparcialidad en la toma de decisiones o que represente un conflicto entre sus intereses personales y los de la empresa.' },
+        { n: 'Artículo 3', titulo: 'Acoso y discriminación', texto: 'La empresa prohíbe de forma absoluta cualquier forma de acoso laboral, sexual o discriminación por razón de género, edad, religión, etnia, discapacidad u orientación sexual.' },
+        { n: 'Artículo 4', titulo: 'Uso de recursos', texto: 'Los recursos tecnológicos y materiales entregados son de uso exclusivamente laboral. Su uso indebido podrá generar responsabilidad administrativa y legal.' },
+        { n: 'Artículo 5', titulo: 'Denuncias', texto: 'Cualquier colaborador podrá reportar de buena fe una conducta contraria a este Código a través del canal ético confidencial, sin temor a represalias.' }
+      ],
+      conformidades: [{ empleadoId: 'EMP-0001', fecha: '2025-08-20T11:30:00.000Z' }]
+    },
+    {
+      id: 'POL-003', titulo: 'Política de Permisos y Vacaciones', categoria: 'Recursos Humanos', version: 'v3.1',
+      fechaActualizacion: '2026-01-10', obligatoria: true,
+      articulos: [
+        { n: 'Artículo 1', titulo: 'Solicitud', texto: 'Toda solicitud de permiso o vacaciones debe registrarse en el módulo de Servicios Internos y ser aprobada por la jefatura inmediata y por Recursos Humanos.' },
+        { n: 'Artículo 2', titulo: 'Plazos', texto: 'Las solicitudes de vacaciones deben presentarse con al menos diez días hábiles de anticipación. Los permisos personales, con al menos cuarenta y ocho horas.' },
+        { n: 'Artículo 3', titulo: 'Permisos médicos', texto: 'Los permisos médicos deben acompañarse de constancia o incapacidad emitida por un profesional autorizado, dentro de las cuarenta y ocho horas siguientes al reintegro.' },
+        { n: 'Artículo 4', titulo: 'Licencias especiales', texto: 'Se reconocen licencias por matrimonio, fallecimiento de familiar directo, paternidad y estudios, conforme a la legislación vigente y a la tabla de días publicada anualmente.' },
+        { n: 'Artículo 5', titulo: 'Saldo de vacaciones', texto: 'El colaborador podrá consultar en todo momento su saldo de días disponibles en el módulo de Autoservicio del sistema.' }
+      ],
+      conformidades: []
+    },
+    {
+      id: 'POL-004', titulo: 'Política de Seguridad de la Información y Protección de Datos', categoria: 'Seguridad', version: 'v1.4',
+      fechaActualizacion: '2025-12-01', obligatoria: true,
+      articulos: [
+        { n: 'Artículo 1', titulo: 'Alcance', texto: 'Esta política aplica a todo el personal, contratistas y terceros que accedan a sistemas de información, datos de empleados o datos de candidatos de la organización.' },
+        { n: 'Artículo 2', titulo: 'Tratamiento de datos personales', texto: 'Los datos personales se tratarán con base en los principios de licitud, finalidad, proporcionalidad, calidad, seguridad y confidencialidad, conforme a la Ley de Protección de Datos Personales.' },
+        { n: 'Artículo 3', titulo: 'Credenciales de acceso', texto: 'Las credenciales son personales e intransferibles. Se prohíbe compartir contraseñas o permitir el acceso de terceros a las cuentas institucionales.' },
+        { n: 'Artículo 4', titulo: 'Respaldo y conservación', texto: 'La información del sistema deberá respaldarse periódicamente mediante la herramienta de exportación JSON y almacenarse en un repositorio autorizado y cifrado.' }
+      ],
+      conformidades: []
+    }
+  ];
+
+  db.auditoria = [
+    { id: uid('LOG'), fecha: new Date().toISOString(), usuario: 'sistema', accion: 'INICIALIZACIÓN', detalle: 'Base de datos demo cargada correctamente.' }
+  ];
+
+  return db;
+}
+
+/* ------------------------------ PERSISTENCIA ------------------------------ */
+let DB = null;
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (!d || !Array.isArray(d.empleados)) return null;
+    d.solicitudes = d.solicitudes || [];
+    d.candidatos  = d.candidatos  || [];
+    d.politicas   = d.politicas   || [];
+    d.auditoria   = d.auditoria   || [];
+    d.meta        = d.meta        || defaultDB().meta;
+    return d;
+  } catch (e) { return null; }
+}
+function saveDB() {
+  try {
+    DB.meta.actualizado = new Date().toISOString();
+    localStorage.setItem(DB_KEY, JSON.stringify(DB));
+    return true;
+  } catch (e) {
+    toast('No se pudo guardar: almacenamiento lleno. Exporte un respaldo JSON y libere espacio.', 'err');
+    console.error(e);
+    return false;
+  }
+}
+function log(accion, detalle) {
+  DB.auditoria.unshift({ id: uid('LOG'), fecha: new Date().toISOString(), usuario: 'admin@itcpo.com', accion, detalle });
+  DB.auditoria = DB.auditoria.slice(0, 400);
+}
+function commit(accion, detalle, silencioso = false) {
+  if (accion) log(accion, detalle);
+  saveDB();
+  if (!silencioso) render();
+}
+
+/* ------------------------------ CONSULTAS ------------------------------ */
+const getEmp  = id => DB.empleados.find(e => e.id === id);
+const getCand = id => DB.candidatos.find(c => c.id === id);
+const nombreEmp = id => { const e = getEmp(id); return e ? `${e.nombre} ${e.apellidos}` : 'Desconocido'; };
+const departamentos = () => [...new Set(DB.empleados.map(e => e.departamento))].sort();
+function saldoVacaciones(emp) {
+  if (!emp) return 0;
+  const tomadas = DB.solicitudes.filter(s => s.empleadoId === emp.id && s.tipo === 'Vacaciones' && s.estado === 'Aprobado')
+    .reduce((a, s) => a + (s.dias || 0), 0);
+  return Math.max(0, (emp.vacacionesAsignadas || 0) - tomadas);
+}
+
+/* =========================================================================
+   ESTADO DE INTERFAZ
+   ========================================================================= */
+const state = {
+  view: 'expediente',
+  empSel: null, empTab: 'datos', empQ: '', empDep: '',
+  solQ: '', solEstado: 'Todas',
+  talTab: 'interno', talQ: '', talCert: '', talDep: '', talNivel: '0',
+  candQ: '', candEstado: 'Todas',
+  polQ: '', polOpen: null,
+  bulk: null
+};
+
+const MODULES = [
+  { id: 'expediente',   label: 'Expediente Digital',       sub: 'Perfil 360° del empleado',                icon: 'user'   },
+  { id: 'solicitudes',  label: 'Servicios y Solicitudes',  sub: 'Autoservicio y flujo de aprobación',      icon: 'inbox'  },
+  { id: 'talento',      label: 'Reclutamiento y Talento',  sub: 'Talento interno y banco de candidatos',   icon: 'search' },
+  { id: 'politicas',    label: 'Políticas y Reglamento',   sub: 'Documentación corporativa y conformidad', icon: 'book'   },
+  { id: 'herramientas', label: 'Herramientas y Admin',     sub: 'Respaldos, importación y carga masiva',   icon: 'tool'   },
+  { id: 'ayuda',        label: 'Ayuda y Aspectos Legales', sub: 'Guía de uso, términos y privacidad',      icon: 'help'   }
+];
+
+/* =========================================================================
+   RENDER PRINCIPAL
+   ========================================================================= */
+function renderNav() {
+  $('#nav').innerHTML = MODULES.map(m => `
+    <button data-act="nav" data-view="${m.id}"
+      class="nav-item w-full flex items-start gap-3 px-3 py-3 rounded-lg text-left text-corp-100/90 hover:bg-white/10 hover:text-white transition ${state.view === m.id ? 'active' : ''}">
+      <span class="mt-0.5 shrink-0">${icon(m.icon)}</span>
+      <span class="min-w-0">
+        <span class="block text-sm font-semibold leading-tight truncate">${m.label}</span>
+        <span class="block text-[11px] text-corp-200/70 truncate">${m.sub}</span>
+      </span>
+    </button>`).join('');
+}
+
+function render() {
+  renderNav();
+  const m = MODULES.find(x => x.id === state.view) || MODULES[0];
+  $('#viewTitle').textContent = m.label;
+  $('#viewSub').textContent = m.sub;
+  const main = $('#main');
+  const html = ({
+    expediente:   viewExpediente,
+    solicitudes:  viewSolicitudes,
+    talento:      viewTalento,
+    politicas:    viewPoliticas,
+    herramientas: viewHerramientas,
+    ayuda:        viewAyuda
+  }[state.view] || viewExpediente)();
+  main.innerHTML = `<div class="fade-in">${html}</div>`;
+  main.scrollTop = 0;
+  if (state.view === 'politicas' && state.polOpen) {
+    const el = document.getElementById('pol-body-' + state.polOpen);
+    if (el) el.classList.remove('hidden');
+  }
+}
+
+/* =========================================================================
+   MÓDULO 1 — EXPEDIENTE DIGITAL DEL EMPLEADO (PERFIL 360°)
+   ========================================================================= */
+function viewExpediente() {
+  if (state.empSel) {
+    const emp = getEmp(state.empSel);
+    if (emp) return empDetail(emp);
+    state.empSel = null;
+  }
+
+  const q = state.empQ.toLowerCase();
+  const list = DB.empleados.filter(e => {
+    const t = `${e.nombre} ${e.apellidos} ${e.puesto} ${e.departamento} ${e.id} ${e.email}`.toLowerCase();
+    return (!q || t.includes(q)) && (!state.empDep || e.departamento === state.empDep);
+  });
+
+  return `
+  <div class="space-y-5">
+    ${pageHeader('Expediente Digital del Empleado', 'Perfil 360°: datos personales, corporativos, documentos, capacitaciones y competencias.',
+      `<button data-act="newEmp" class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition">
+        ${icon('plus','w-4 h-4')} Nuevo Empleado
+      </button>`)}
+    ${statCards([
+      { label: 'Colaboradores', value: DB.empleados.length, tone: 'corp' },
+      { label: 'Activos', value: DB.empleados.filter(e => e.estado === 'Activo').length, tone: 'green' },
+      { label: 'Departamentos', value: departamentos().length, tone: 'violet' },
+      { label: 'Documentos en expediente', value: DB.empleados.reduce((a, e) => a + (e.documentos?.length || 0), 0), tone: 'orange' }
+    ])}
+    <div class="bg-white rounded-xl border border-slate-200 p-4 flex flex-col md:flex-row gap-3">
+      <div class="relative flex-1">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${icon('search','w-4 h-4')}</span>
+        <input value="${esc(state.empQ)}" oninput="state.empQ=this.value;document.getElementById('empGrid').innerHTML=empCards()"
+          placeholder="Buscar por nombre, puesto, correo o código…"
+          class="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-corp-500/30 focus:border-corp-500 outline-none text-sm">
+      </div>
+      <select onchange="state.empDep=this.value;document.getElementById('empGrid').innerHTML=empCards()"
+        class="px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 bg-white">
+        <option value="">Todos los departamentos</option>
+        ${departamentos().map(d => `<option ${state.empDep === d ? 'selected' : ''}>${esc(d)}</option>`).join('')}
+      </select>
+    </div>
+    <div id="empGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">${empCards()}</div>
+  </div>`;
+}
+
+function empCards() {
+  const q = state.empQ.toLowerCase();
+  const list = DB.empleados.filter(e => {
+    const t = `${e.nombre} ${e.apellidos} ${e.puesto} ${e.departamento} ${e.id} ${e.email}`.toLowerCase();
+    return (!q || t.includes(q)) && (!state.empDep || e.departamento === state.empDep);
+  });
+  if (!list.length) return `<div class="col-span-full">${emptyState('Sin resultados', 'No se encontraron colaboradores con los filtros aplicados.')}</div>`;
+
+  return list.map(e => `
+    <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md hover:border-corp-300 transition group">
+      <div class="flex items-start gap-4">
+        <div class="w-14 h-14 rounded-xl ${avatarColor(e.nombre + e.apellidos)} text-white grid place-items-center font-bold text-lg shrink-0 shadow-sm">
+          ${initials(e.nombre + ' ' + e.apellidos)}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="font-bold text-slate-800 leading-tight truncate">${esc(e.nombre)} ${esc(e.apellidos)}</p>
+          <p class="text-xs text-slate-500 truncate">${esc(e.puesto)}</p>
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            ${badge(e.estado)}
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-corp-50 text-corp-700 ring-1 ring-corp-200">${esc(e.departamento)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 space-y-1.5 text-xs text-slate-600">
+        <p class="flex items-center gap-2 truncate">${icon('doc','w-3.5 h-3.5 text-slate-400')} ${esc(e.email)}</p>
+        <p class="flex items-center gap-2">${icon('clock','w-3.5 h-3.5 text-slate-400')} Ingreso: ${fmt(e.fechaIngreso)}</p>
+        <p class="flex items-center gap-2">${icon('award','w-3.5 h-3.5 text-slate-400')} ${(e.competencias || []).length} competencias · ${(e.capacitaciones || []).length} capacitaciones</p>
+      </div>
+      <div class="mt-4 flex items-center justify-between">
+        <span class="text-[11px] font-mono text-slate-400">${esc(e.id)}</span>
+        <button data-act="viewEmp" data-id="${e.id}"
+          class="inline-flex items-center gap-1.5 text-xs font-semibold text-corp-600 group-hover:text-accent-600 transition">
+          Ver perfil 360° ${icon('eye','w-3.5 h-3.5')}
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function empDetail(e) {
+  const tabs = [
+    ['datos', 'Datos Personales', 'user'],
+    ['documentos', 'Documentos', 'doc'],
+    ['capacitaciones', 'Capacitaciones', 'award'],
+    ['competencias', 'Competencias', 'chart'],
+    ['solicitudes', 'Solicitudes', 'inbox']
+  ];
+  const sols = DB.solicitudes.filter(s => s.empleadoId === e.id);
+  const docsCount = (e.documentos || []).length;
+
+  let body = '';
+  if (state.empTab === 'datos') {
+    body = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+        ${field('Código de empleado', e.id)}
+        ${field('Estado', badge(e.estado))}
+        ${field('Nombre completo', `${esc(e.nombre)} ${esc(e.apellidos)}`)}
+        ${field('Fecha de nacimiento', fmt(e.fechaNacimiento))}
+        ${field('Género', e.genero || '—')}
+        ${field('Nivel académico', e.nivelAcademico || '—')}
+        ${field('Correo corporativo', e.email)}
+        ${field('Teléfono', e.telefono || '—')}
+        ${field('DUI', e.dui || '—')}
+        ${field('NIT', e.nit || '—')}
+        ${field('Dirección', e.direccion || '—')}
+        ${field('Departamento', e.departamento)}
+        ${field('Puesto', e.puesto)}
+        ${field('Jefe inmediato', e.jefe || '—')}
+        ${field('Fecha de ingreso', fmt(e.fechaIngreso))}
+        ${field('Tipo de contrato', e.tipoContrato || '—')}
+        ${field('Salario base', e.salario ? '$' + Number(e.salario).toFixed(2) : '—')}
+        ${field('Antigüedad', antiguedad(e.fechaIngreso))}
+        ${field('Días de vacaciones asignados', e.vacacionesAsignadas ?? 0)}
+        ${field('Saldo de vacaciones disponible', `<span class="font-bold text-emerald-600">${saldoVacaciones(e)} días</span>`)}
+      </div>`;
+  } else if (state.empTab === 'documentos') {
+    body = `
+      <div class="doc-drop border-2 border-dashed border-slate-300 rounded-xl p-6 text-center transition"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="dropDocs(event)">
+        <div class="mx-auto w-12 h-12 rounded-full bg-accent-50 text-accent-600 grid place-items-center mb-3">${icon('up','w-6 h-6')}</div>
+        <p class="font-semibold text-slate-700 text-sm">Arrastra y suelta archivos aquí</p>
+        <p class="text-xs text-slate-500 mt-1">Soporta PDF e imágenes (JPG, PNG, WEBP). Máx. recomendado 2 MB por archivo.</p>
+        <input type="file" id="docInput" class="hidden" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" onchange="uploadDocs(this.files)">
+        <button data-act="pickDoc" class="mt-4 inline-flex items-center gap-2 bg-corp-600 hover:bg-corp-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+          ${icon('plus','w-4 h-4')} Seleccionar archivos
+        </button>
+      </div>
+      <div class="mt-5">
+        <h4 class="text-sm font-bold text-slate-700 mb-3">Documentos del expediente (${docsCount})</h4>
+        ${docsCount ? `<div class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-white">
+          ${e.documentos.map(d => docRow(e.id, d)).join('')}
+        </div>` : emptyState('Sin documentos', 'Cargue CV, certificaciones, diplomas o títulos para completar el expediente.')}
+      </div>`;
+  } else if (state.empTab === 'capacitaciones') {
+    const caps = e.capacitaciones || [];
+    body = `
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-sm font-bold text-slate-700">Historial de capacitaciones (${caps.length})</h4>
+        <button data-act="newCap" class="inline-flex items-center gap-1.5 bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">${icon('plus','w-3.5 h-3.5')} Registrar</button>
+      </div>
+      ${caps.length ? `<div class="overflow-x-auto border border-slate-200 rounded-xl">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+            <tr><th class="text-left px-4 py-3">Capacitación</th><th class="text-left px-4 py-3">Institución</th><th class="text-left px-4 py-3">Fecha</th><th class="text-center px-4 py-3">Horas</th><th class="text-center px-4 py-3">Estado</th><th class="px-4 py-3"></th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${caps.map(c => `<tr class="hover:bg-slate-50">
+              <td class="px-4 py-3 font-medium text-slate-700">${esc(c.nombre)}</td>
+              <td class="px-4 py-3 text-slate-600">${esc(c.institucion || '—')}</td>
+              <td class="px-4 py-3 text-slate-600">${fmt(c.fecha)}</td>
+              <td class="px-4 py-3 text-center text-slate-600">${c.horas || 0}</td>
+              <td class="px-4 py-3 text-center">${badge(c.estado || 'Completado')}</td>
+              <td class="px-4 py-3 text-right">
+                <button data-act="delCap" data-id="${c.id}" class="text-rose-500 hover:text-rose-700">${icon('trash','w-4 h-4')}</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : emptyState('Sin capacitaciones', 'Registre cursos, diplomados y certificaciones del colaborador.')}`;
+  } else if (state.empTab === 'competencias') {
+    const comps = e.competencias || [];
+    body = `
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-sm font-bold text-slate-700">Competencias clave (${comps.length})</h4>
+        <button data-act="newComp" class="inline-flex items-center gap-1.5 bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">${icon('plus','w-3.5 h-3.5')} Agregar</button>
+      </div>
+      ${comps.length ? `<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        ${comps.map(c => `
+          <div class="border border-slate-200 rounded-xl p-4 bg-white">
+            <div class="flex items-center justify-between">
+              <p class="font-semibold text-sm text-slate-700">${esc(c.nombre)}</p>
+              <button data-act="delComp" data-id="${esc(c.nombre)}" class="text-rose-400 hover:text-rose-600">${icon('x','w-4 h-4')}</button>
+            </div>
+            <div class="mt-3 flex items-center gap-3">
+              <div class="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full ${c.nivel >= 4 ? 'bg-emerald-500' : c.nivel === 3 ? 'bg-amber-400' : 'bg-rose-400'}" style="width:${(c.nivel / 5) * 100}%"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-600">${c.nivel}/5</span>
+            </div>
+          </div>`).join('')}
+      </div>` : emptyState('Sin competencias', 'Registre las competencias clave del colaborador con su nivel de dominio.')}`;
+  } else {
+    body = `
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-sm font-bold text-slate-700">Solicitudes del colaborador (${sols.length})</h4>
+        <button data-act="newSol" class="inline-flex items-center gap-1.5 bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">${icon('plus','w-3.5 h-3.5')} Nueva solicitud</button>
+      </div>
+      ${sols.length ? solTable(sols, false) : emptyState('Sin solicitudes', 'Este colaborador no registra solicitudes todavía.')}`;
+  }
+
+  return `
+  <div class="space-y-5">
+    <button data-act="backEmp" class="inline-flex items-center gap-2 text-sm font-semibold text-corp-600 hover:text-accent-600 transition">
+      ${icon('back','w-4 h-4')} Volver al listado
+    </button>
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div class="h-24 bg-gradient-to-r from-corp-700 via-corp-600 to-accent-500"></div>
+      <div class="px-6 pb-6">
+        <div class="flex flex-col md:flex-row md:items-end gap-4 -mt-12">
+          <div class="w-24 h-24 rounded-2xl ${avatarColor(e.nombre + e.apellidos)} text-white grid place-items-center font-black text-3xl ring-4 ring-white shadow-lg shrink-0">
+            ${initials(e.nombre + ' ' + e.apellidos)}
+          </div>
+          <div class="flex-1 min-w-0 md:pb-1">
+            <h3 class="text-2xl font-bold text-slate-800 leading-tight">${esc(e.nombre)} ${esc(e.apellidos)}</h3>
+            <p class="text-sm text-slate-500">${esc(e.puesto)} · ${esc(e.departamento)}</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              ${badge(e.estado)}
+              <span class="text-[11px] font-mono text-slate-400">${esc(e.id)}</span>
+              <span class="text-[11px] text-slate-500">· ${antiguedad(e.fechaIngreso)} en la empresa</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 md:pb-1">
+            <button data-act="editEmp" data-id="${e.id}" class="inline-flex items-center gap-2 bg-corp-600 hover:bg-corp-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">${icon('edit','w-4 h-4')} Editar</button>
+            <button data-act="delEmp" data-id="${e.id}" class="inline-flex items-center gap-2 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 text-sm font-semibold px-4 py-2 rounded-lg transition">${icon('trash','w-4 h-4')} Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      ${miniStat('Saldo de vacaciones', saldoVacaciones(e) + ' días', 'emerald', 'clock')}
+      ${miniStat('Documentos', docsCount, 'corp', 'doc')}
+      ${miniStat('Capacitaciones', (e.capacitaciones || []).length, 'violet', 'award')}
+      ${miniStat('Solicitudes', sols.length, 'orange', 'inbox')}
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+      <div class="border-b border-slate-200 px-3 pt-3 flex gap-1 overflow-x-auto">
+        ${tabs.map(([id, label, ic]) => `
+          <button data-act="empTab" data-tab="${id}"
+            class="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-t-lg transition
+            ${state.empTab === id ? 'text-accent-600 border-b-2 border-accent-500 bg-accent-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}">
+            ${icon(ic,'w-4 h-4')} ${label}
+          </button>`).join('')}
+      </div>
+      <div class="p-6">${body}</div>
+    </div>
+  </div>`;
+}
+
+function antiguedad(fecha) {
+  if (!fecha) return '—';
+  const d = new Date(fecha), n = new Date();
+  let a = n.getFullYear() - d.getFullYear();
+  let m = n.getMonth() - d.getMonth();
+  if (m < 0) { a--; m += 12; }
+  if (a <= 0 && m <= 0) return 'Menos de 1 mes';
+  return `${a > 0 ? a + ' año' + (a > 1 ? 's' : '') : ''}${a > 0 && m > 0 ? ' y ' : ''}${m > 0 ? m + ' mes' + (m > 1 ? 'es' : '') : ''}`;
+}
+function field(label, value) {
+  return `<div>
+    <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">${label}</p>
+    <p class="text-sm text-slate-700 mt-0.5 break-words">${value || '—'}</p>
+  </div>`;
+}
+function docRow(empId, d) {
+  const esPdf = (d.tipo || '').includes('pdf') || /\.pdf$/i.test(d.nombre);
+  return `<div class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50">
+    <div class="w-9 h-9 rounded-lg ${esPdf ? 'bg-rose-50 text-rose-600' : 'bg-sky-50 text-sky-600'} grid place-items-center shrink-0">
+      ${esPdf ? '<span class="text-[10px] font-black">PDF</span>' : icon('doc','w-4 h-4')}
+    </div>
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-medium text-slate-700 truncate">${esc(d.nombre)}</p>
+      <p class="text-[11px] text-slate-400">${bytes(d.size)} · Cargado el ${fmt(d.fecha)}${d.demo ? ' · <span class="text-amber-600 font-semibold">ejemplo</span>' : ''}</p>
+    </div>
+    <div class="flex items-center gap-1">
+      <button data-act="prevDoc" data-emp="${empId}" data-id="${d.id}" title="Previsualizar"
+        class="p-2 rounded-lg text-corp-600 hover:bg-corp-50 transition">${icon('eye','w-4 h-4')}</button>
+      ${d.data ? `<button data-act="dlDoc" data-emp="${empId}" data-id="${d.id}" title="Descargar"
+        class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition">${icon('down','w-4 h-4')}</button>` : ''}
+      <button data-act="delDoc" data-emp="${empId}" data-id="${d.id}" title="Eliminar"
+        class="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition">${icon('trash','w-4 h-4')}</button>
+    </div>
+  </div>`;
+}
+
+/* ---- Carga de documentos ---- */
+window.pickDoc = () => document.getElementById('docInput')?.click();
+window.dropDocs = ev => {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('dragover');
+  if (ev.dataTransfer?.files?.length) uploadDocs(ev.dataTransfer.files);
+};
+window.uploadDocs = async files => {
+  const emp = getEmp(state.empSel);
+  if (!emp) return;
+  if (!emp.documentos) emp.documentos = [];
+  let ok = 0, avisos = 0;
+  for (const f of files) {
+    const permitido = /\.(pdf|png|jpe?g|webp)$/i.test(f.name) || ['application/pdf','image/png','image/jpeg','image/webp'].includes(f.type);
+    if (!permitido) { toast(`Formato no permitido: ${f.name}`, 'err'); continue; }
+    const MAX = 2 * 1024 * 1024;
+    let data = null;
+    if (f.size <= MAX) {
+      try { data = await readAsDataURL(f); } catch (e) { data = null; }
+    } else { avisos++; }
+    emp.documentos.unshift({
+      id: uid('DOC'), nombre: f.name, tipo: f.type || 'application/octet-stream',
+      size: f.size, fecha: hoy(), data, demo: false
+    });
+    ok++;
+  }
+  if (ok) commit('DOCUMENTO_CARGADO', `${ok} documento(s) cargado(s) en el expediente de ${emp.nombre} ${emp.apellidos}.`, true);
+  if (ok) render();
+  if (ok) toast(`${ok} documento(s) agregado(s) al expediente.`, 'ok');
+  if (avisos) toast(`${avisos} archivo(s) superan 2 MB: se guardaron solo los metadatos.`, 'warn');
+};
+
+/* =========================================================================
+   MÓDULO 2 — SERVICIOS INTERNOS Y SOLICITUDES
+   ========================================================================= */
+const TIPOS_SOLICITUD = ['Vacaciones', 'Permiso personal', 'Permiso médico', 'Licencia especial', 'Otros'];
+
+function viewSolicitudes() {
+  let list = DB.solicitudes.slice().sort((a, b) => (b.fechaSolicitud || '').localeCompare(a.fechaSolicitud || ''));
+  if (state.solEstado !== 'Todas') list = list.filter(s => s.estado === state.solEstado);
+  if (state.solQ) {
+    const q = state.solQ.toLowerCase();
+    list = list.filter(s => `${nombreEmp(s.empleadoId)} ${s.tipo} ${s.motivo} ${s.id}`.toLowerCase().includes(q));
+  }
+  const pend = DB.solicitudes.filter(s => s.estado === 'Pendiente').length;
+  const apro = DB.solicitudes.filter(s => s.estado === 'Aprobado').length;
+  const rech = DB.solicitudes.filter(s => s.estado === 'Rechazado').length;
+  const totalDias = DB.solicitudes.filter(s => s.estado === 'Aprobado').reduce((a, s) => a + (s.dias || 0), 0);
+
+  return `
+  <div class="space-y-5">
+    ${pageHeader('Servicios Internos y Solicitudes', 'Autoservicio del colaborador con flujo de aprobación y control de días disponibles.',
+      `<button data-act="newSol" class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg shadow-sm transition">
+        ${icon('plus','w-4 h-4')} Nueva Solicitud
+      </button>`)}
+    ${statCards([
+      { label: 'Pendientes', value: pend, tone: 'amber' },
+      { label: 'Aprobadas', value: apro, tone: 'green' },
+      { label: 'Rechazadas', value: rech, tone: 'red' },
+      { label: 'Días aprobados (total)', value: totalDias, tone: 'corp' }
+    ])}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-4">
+        <div class="flex flex-col md:flex-row gap-3 mb-4">
+          <div class="relative flex-1">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${icon('search','w-4 h-4')}</span>
+            <input value="${esc(state.solQ)}" oninput="state.solQ=this.value;document.getElementById('solWrap').innerHTML=solTableBody()"
+              placeholder="Buscar por colaborador, tipo o motivo…"
+              class="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-corp-500/30 focus:border-corp-500 outline-none text-sm">
+          </div>
+          <select onchange="state.solEstado=this.value;document.getElementById('solWrap').innerHTML=solTableBody()"
+            class="px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 bg-white">
+            ${['Todas', 'Pendiente', 'Aprobado', 'Rechazado'].map(e => `<option ${state.solEstado === e ? 'selected' : ''}>${e}</option>`).join('')}
+          </select>
+        </div>
+        <div id="solWrap">${solTableBody()}</div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <h4 class="font-bold text-slate-700 text-sm mb-1 flex items-center gap-2">${icon('clock','w-4 h-4 text-accent-500')} Saldos de vacaciones</h4>
+        <p class="text-xs text-slate-500 mb-4">Días disponibles por colaborador (asignados − aprobados).</p>
+        <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
+          ${DB.empleados.map(e => {
+            const saldo = saldoVacaciones(e);
+            const pct = e.vacacionesAsignadas ? (saldo / e.vacacionesAsignadas) * 100 : 0;
+            return `<div>
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-medium text-slate-700 truncate pr-2">${esc(e.nombre)} ${esc(e.apellidos)}</span>
+                <span class="font-bold ${saldo > 5 ? 'text-emerald-600' : saldo > 0 ? 'text-amber-600' : 'text-rose-600'}">${saldo}/${e.vacacionesAsignadas}</span>
+              </div>
+              <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full ${pct > 40 ? 'bg-emerald-500' : pct > 15 ? 'bg-amber-400' : 'bg-rose-400'}" style="width:${pct}%"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function solTableBody() {
+  let list = DB.solicitudes.slice().sort((a, b) => (b.fechaSolicitud || '').localeCompare(a.fechaSolicitud || ''));
+  if (state.solEstado !== 'Todas') list = list.filter(s => s.estado === state.solEstado);
+  if (state.solQ) {
+    const q = state.solQ.toLowerCase();
+    list = list.filter(s => `${nombreEmp(s.empleadoId)} ${s.tipo} ${s.motivo} ${s.id}`.toLowerCase().includes(q));
+  }
+  if (!list.length) return emptyState('Sin solicitudes', 'No hay solicitudes que coincidan con los filtros.');
+  return solTable(list, true);
+}
+
+function solTable(list, conAcciones) {
+  return `
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+        <tr>
+          <th class="text-left px-4 py-3">Colaborador</th>
+          <th class="text-left px-4 py-3">Tipo</th>
+          <th class="text-left px-4 py-3">Periodo</th>
+          <th class="text-center px-4 py-3">Días</th>
+          <th class="text-center px-4 py-3">Estado</th>
+          ${conAcciones ? '<th class="text-right px-4 py-3">Acciones</th>' : ''}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        ${list.map(s => `
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3">
+              <p class="font-medium text-slate-700">${esc(nombreEmp(s.empleadoId))}</p>
+              <p class="text-[11px] text-slate-400 font-mono">${esc(s.id)}</p>
+            </td>
+            <td class="px-4 py-3 text-slate-600">${esc(s.tipo)}</td>
+            <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${fmt(s.fechaInicio)} → ${fmt(s.fechaFin)}</td>
+            <td class="px-4 py-3 text-center font-semibold text-slate-700">${s.dias}</td>
+            <td class="px-4 py-3 text-center">${badge(s.estado)}</td>
+            ${conAcciones ? `<td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-1">
+                <button data-act="verSol" data-id="${s.id}" title="Detalle" class="p-2 rounded-lg text-corp-600 hover:bg-corp-50">${icon('eye','w-4 h-4')}</button>
+                ${s.estado === 'Pendiente' ? `
+                  <button data-act="aprobarSol" data-id="${s.id}" title="Aprobar" class="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50">${icon('check','w-4 h-4')}</button>
+                  <button data-act="rechazarSol" data-id="${s.id}" title="Rechazar" class="p-2 rounded-lg text-rose-600 hover:bg-rose-50">${icon('x','w-4 h-4')}</button>` : ''}
+                <button data-act="delSol" data-id="${s.id}" title="Eliminar" class="p-2 rounded-lg text-slate-400 hover:bg-slate-100">${icon('trash','w-4 h-4')}</button>
+              </div>
+            </td>` : ''}
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+/* =========================================================================
+   MÓDULO 3 — RECLUTAMIENTO, TALENTO INTERNO Y BANCO DE CANDIDATOS
+   ========================================================================= */
+function viewTalento() {
+  return `
+  <div class="space-y-5">
+    ${pageHeader('Reclutamiento, Talento Interno y Banco de Candidatos',
+      'Búsqueda inteligente de talento interno y gestión del pipeline de candidatos externos.')}
+
+    <div class="flex gap-2 border-b border-slate-200">
+      ${[['interno','Búsqueda de Talento Interno','search'],['candidatos','Banco de Candidatos','user']].map(([id,label,ic]) => `
+        <button data-act="talTab" data-tab="${id}"
+          class="inline-flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition
+          ${state.talTab === id ? 'border-accent-500 text-accent-600' : 'border-transparent text-slate-500 hover:text-slate-700'}">
+          ${icon(ic,'w-4 h-4')} ${label}
+        </button>`).join('')}
+    </div>
+
+    ${state.talTab === 'interno' ? talentoInterno() : bancoCandidatos()}
+  </div>`;
+}
+
+function talentoInterno() {
+  const q = state.talQ.toLowerCase(), cq = state.talCert.toLowerCase();
+  const nivelMin = parseInt(state.talNivel || '0', 10);
+
+  const resultados = DB.empleados.map(e => {
+    const comps = e.competencias || [];
+    const caps  = e.capacitaciones || [];
+    const skillHits = q ? comps.filter(c => c.nombre.toLowerCase().includes(q)) : [];
+    const certHits  = cq ? caps.filter(c => c.nombre.toLowerCase().includes(cq) || (c.institucion || '').toLowerCase().includes(cq)) : [];
+    const nivelOk = !nivelMin || comps.some(c => c.nivel >= nivelMin && (!q || c.nombre.toLowerCase().includes(q)));
+    return { e, skillHits, certHits, nivelOk, score: skillHits.length * 2 + certHits.length * 2 + (nivelMin && nivelOk ? 1 : 0) };
+  })
+  .filter(r => {
+    if (state.talDep && r.e.departamento !== state.talDep) return false;
+    if (q && r.skillHits.length === 0) return false;
+    if (cq && r.certHits.length === 0) return false;
+    if (nivelMin && !r.nivelOk) return false;
+    return true;
+  })
+  .sort((a, b) => b.score - a.score || a.e.nombre.localeCompare(b.e.nombre));
+
+  return `
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
+    <div class="lg:col-span-1 bg-white rounded-xl border border-slate-200 p-5 space-y-4 h-fit">
+      <h4 class="font-bold text-slate-700 text-sm flex items-center gap-2">${icon('search','w-4 h-4 text-accent-500')} Filtros de búsqueda</h4>
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1">Habilidad o competencia</label>
+        <input value="${esc(state.talQ)}" oninput="state.talQ=this.value;document.getElementById('talRes').innerHTML=talentoInternoResultados()"
+          placeholder="Ej. Liderazgo, SQL, Excel…"
+          class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 focus:ring-2 focus:ring-corp-500/30">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1">Certificación o capacitación</label>
+        <input value="${esc(state.talCert)}" oninput="state.talCert=this.value;document.getElementById('talRes').innerHTML=talentoInternoResultados()"
+          placeholder="Ej. AWS, NIIF, Scrum…"
+          class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 focus:ring-2 focus:ring-corp-500/30">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1">Departamento</label>
+        <select onchange="state.talDep=this.value;document.getElementById('talRes').innerHTML=talentoInternoResultados()"
+          class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 bg-white">
+          <option value="">Todos</option>
+          ${departamentos().map(d => `<option ${state.talDep === d ? 'selected' : ''}>${esc(d)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-500 mb-1">Nivel mínimo de dominio</label>
+        <select onchange="state.talNivel=this.value;document.getElementById('talRes').innerHTML=talentoInternoResultados()"
+          class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 bg-white">
+          ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${state.talNivel === String(n) ? 'selected' : ''}>${n === 0 ? 'Cualquiera' : n + ' / 5'}</option>`).join('')}
+        </select>
+      </div>
+      <button onclick="state.talQ='';state.talCert='';state.talDep='';state.talNivel='0';render()"
+        class="w-full text-xs font-semibold text-slate-500 hover:text-accent-600 py-2 rounded-lg border border-slate-200 hover:border-accent-300 transition">
+        Limpiar filtros
+      </button>
+    </div>
+
+    <div class="lg:col-span-3" id="talRes">${talentoInternoResultados()}</div>
+  </div>`;
+}
+
+function talentoInternoResultados() {
+  const q = state.talQ.toLowerCase(), cq = state.talCert.toLowerCase();
+  const nivelMin = parseInt(state.talNivel || '0', 10);
+
+  const resultados = DB.empleados.map(e => {
+    const comps = e.competencias || [];
+    const caps  = e.capacitaciones || [];
+    const skillHits = q ? comps.filter(c => c.nombre.toLowerCase().includes(q)) : [];
+    const certHits  = cq ? caps.filter(c => c.nombre.toLowerCase().includes(cq) || (c.institucion || '').toLowerCase().includes(cq)) : [];
+    const nivelOk = !nivelMin || comps.some(c => c.nivel >= nivelMin && (!q || c.nombre.toLowerCase().includes(q)));
+    return { e, skillHits, certHits, nivelOk, score: skillHits.length * 2 + certHits.length * 2 + (nivelMin && nivelOk ? 1 : 0) };
+  })
+  .filter(r => {
+    if (state.talDep && r.e.departamento !== state.talDep) return false;
+    if (q && r.skillHits.length === 0) return false;
+    if (cq && r.certHits.length === 0) return false;
+    if (nivelMin && !r.nivelOk) return false;
+    return true;
+  })
+  .sort((a, b) => b.score - a.score || a.e.nombre.localeCompare(b.e.nombre));
+
+  const hayFiltros = q || cq || state.talDep || nivelMin;
+
+  if (!resultados.length) {
+    return emptyState('Sin coincidencias', hayFiltros
+      ? 'Ningún colaborador cumple con los criterios. Ajuste los filtros de búsqueda.'
+      : 'Utilice los filtros para localizar talento interno por habilidad, certificación o departamento.');
+  }
+
+  return `
+  <div class="space-y-3">
+    <p class="text-xs text-slate-500">${resultados.length} colaborador(es) encontrado(s)${hayFiltros ? ' según los criterios aplicados' : ''}.</p>
+    ${resultados.map(r => `
+      <div class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="w-12 h-12 rounded-xl ${avatarColor(r.e.nombre + r.e.apellidos)} text-white grid place-items-center font-bold shrink-0">
+            ${initials(r.e.nombre + ' ' + r.e.apellidos)}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-slate-800">${esc(r.e.nombre)} ${esc(r.e.apellidos)}</p>
+            <p class="text-xs text-slate-500">${esc(r.e.puesto)} · ${esc(r.e.departamento)}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-accent-50 text-accent-700 ring-1 ring-accent-200">Afinidad ${r.score}</span>
+            <button data-act="viewEmp" data-id="${r.e.id}" class="text-xs font-semibold text-corp-600 hover:text-accent-600">Ver perfil →</button>
+          </div>
+        </div>
+        ${r.skillHits.length ? `<div class="mt-3 flex flex-wrap gap-1.5">
+          ${r.skillHits.map(c => `<span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 font-medium">${esc(c.nombre)} · ${c.nivel}/5</span>`).join('')}
+        </div>` : ''}
+        ${r.certHits.length ? `<div class="mt-2 flex flex-wrap gap-1.5">
+          ${r.certHits.map(c => `<span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 ring-1 ring-sky-200 font-medium">🎓 ${esc(c.nombre)}</span>`).join('')}
+        </div>` : ''}
+      </div>`).join('')}
+  </div>`;
+}
+
+function bancoCandidatos() {
+  let list = DB.candidatos.slice().sort((a, b) => (b.fechaRegistro || '').localeCompare(a.fechaRegistro || ''));
+  if (state.candEstado !== 'Todas') list = list.filter(c => c.estado === state.candEstado);
+  if (state.candQ) {
+    const q = state.candQ.toLowerCase();
+    list = list.filter(c => `${c.nombre} ${c.email} ${c.puesto} ${(c.habilidades || []).join(' ')}`.toLowerCase().includes(q));
+  }
+  const porEstado = e => DB.candidatos.filter(c => c.estado === e).length;
+
+  return `
+  <div class="space-y-5">
+    ${statCards([
+      { label: 'Total candidatos', value: DB.candidatos.length, tone: 'corp' },
+      { label: 'En Revisión', value: porEstado('En Revisión'), tone: 'amber' },
+      { label: 'En Entrevista', value: porEstado('Entrevista'), tone: 'blue' },
+      { label: 'Contratados', value: porEstado('Contratado'), tone: 'green' }
+    ])}
+
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <div class="flex flex-col md:flex-row gap-3 mb-4">
+        <div class="relative flex-1">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${icon('search','w-4 h-4')}</span>
+          <input value="${esc(state.candQ)}" oninput="state.candQ=this.value;document.getElementById('candWrap').innerHTML=tablaCandidatos()"
+            placeholder="Buscar por nombre, correo, puesto o habilidad…"
+            class="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 focus:ring-2 focus:ring-corp-500/30">
+        </div>
+        <select onchange="state.candEstado=this.value;document.getElementById('candWrap').innerHTML=tablaCandidatos()"
+          class="px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 bg-white">
+          ${['Todas','En Revisión','Entrevista','Contratado','Descartado'].map(e => `<option ${state.candEstado === e ? 'selected' : ''}>${e}</option>`).join('')}
+        </select>
+        <button data-act="newCand" class="inline-flex items-center justify-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition whitespace-nowrap">
+          ${icon('plus','w-4 h-4')} Nuevo candidato
+        </button>
+        <button data-act="gotoBulk" class="inline-flex items-center justify-center gap-2 bg-white border border-slate-300 hover:border-accent-400 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-lg transition whitespace-nowrap">
+          ${icon('up','w-4 h-4')} Carga masiva
+        </button>
+      </div>
+      <div id="candWrap">${tablaCandidatos()}</div>
+    </div>
+  </div>`;
+}
+
+function tablaCandidatos() {
+  let list = DB.candidatos.slice().sort((a, b) => (b.fechaRegistro || '').localeCompare(a.fechaRegistro || ''));
+  if (state.candEstado !== 'Todas') list = list.filter(c => c.estado === state.candEstado);
+  if (state.candQ) {
+    const q = state.candQ.toLowerCase();
+    list = list.filter(c => `${c.nombre} ${c.email} ${c.puesto} ${(c.habilidades || []).join(' ')}`.toLowerCase().includes(q));
+  }
+  if (!list.length) return emptyState('Sin candidatos', 'No hay postulantes que coincidan con los filtros. Puede registrar uno nuevo o realizar una carga masiva CSV/PDF.');
+
+  return `
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+        <tr>
+          <th class="text-left px-4 py-3">Candidato</th>
+          <th class="text-left px-4 py-3">Puesto</th>
+          <th class="text-left px-4 py-3">Habilidades</th>
+          <th class="text-center px-4 py-3">Exp.</th>
+          <th class="text-center px-4 py-3">Estado</th>
+          <th class="text-right px-4 py-3">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        ${list.map(c => `
+          <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg ${avatarColor(c.nombre)} text-white grid place-items-center text-xs font-bold shrink-0">${initials(c.nombre)}</div>
+                <div class="min-w-0">
+                  <p class="font-medium text-slate-700 truncate">${esc(c.nombre)}</p>
+                  <p class="text-[11px] text-slate-400 truncate">${esc(c.email)}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-slate-600">${esc(c.puesto)}<br><span class="text-[11px] text-slate-400">${esc(c.fuente || '')}</span></td>
+            <td class="px-4 py-3">
+              <div class="flex flex-wrap gap-1 max-w-[220px]">
+                ${(c.habilidades || []).slice(0, 3).map(h => `<span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">${esc(h)}</span>`).join('')}
+                ${(c.habilidades || []).length > 3 ? `<span class="text-[10px] text-slate-400">+${c.habilidades.length - 3}</span>` : ''}
+              </div>
+            </td>
+            <td class="px-4 py-3 text-center text-slate-600">${c.experiencia || 0} a.</td>
+            <td class="px-4 py-3 text-center">
+              <select data-act="candEstado" data-id="${c.id}"
+                class="text-[11px] font-semibold rounded-full border-0 px-2 py-1 cursor-pointer outline-none ring-1 ${(BADGE_MAP[c.estado] || 'bg-slate-100 text-slate-600 ring-slate-200')}">
+                ${['En Revisión','Entrevista','Contratado','Descartado'].map(e => `<option ${c.estado === e ? 'selected' : ''}>${e}</option>`).join('')}
+              </select>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-1">
+                <button data-act="verCand" data-id="${c.id}" title="Ver detalle" class="p-2 rounded-lg text-corp-600 hover:bg-corp-50">${icon('eye','w-4 h-4')}</button>
+                <button data-act="delCand" data-id="${c.id}" title="Eliminar" class="p-2 rounded-lg text-rose-500 hover:bg-rose-50">${icon('trash','w-4 h-4')}</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+/* =========================================================================
+   MÓDULO 4 — PORTAL DE POLÍTICAS Y REGLAMENTO INTERNO
+   ========================================================================= */
+function viewPoliticas() {
+  const q = state.polQ.toLowerCase();
+  const list = DB.politicas.filter(p => {
+    if (!q) return true;
+    const texto = `${p.titulo} ${p.categoria} ${p.articulos.map(a => a.n + ' ' + a.titulo + ' ' + a.texto).join(' ')}`.toLowerCase();
+    return texto.includes(q);
+  });
+
+  const totalConf = DB.politicas.reduce((a, p) => a + (p.conformidades || []).length, 0);
+  const totalPosibles = DB.politicas.length * DB.empleados.length;
+  const pct = totalPosibles ? Math.round((totalConf / totalPosibles) * 100) : 0;
+
+  return `
+  <div class="space-y-5">
+    ${pageHeader('Portal de Políticas y Reglamento Interno',
+      'Centro de documentación corporativa con búsqueda de artículos y confirmación de lectura.')}
+
+    ${statCards([
+      { label: 'Documentos publicados', value: DB.politicas.length, tone: 'corp' },
+      { label: 'Artículos indexados', value: DB.politicas.reduce((a, p) => a + p.articulos.length, 0), tone: 'violet' },
+      { label: 'Conformidades firmadas', value: totalConf, tone: 'green' },
+      { label: 'Cobertura de lectura', value: pct + '%', tone: 'orange' }
+    ])}
+
+    <div class="relative bg-white rounded-xl border border-slate-200 p-1">
+      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">${icon('search','w-4 h-4')}</span>
+      <input value="${esc(state.polQ)}" oninput="state.polQ=this.value;document.getElementById('polList').innerHTML=listaPoliticas()"
+        placeholder="Buscar por palabra clave, artículo o tema (ej. vacaciones, acoso, confidencialidad)…"
+        class="w-full pl-10 pr-4 py-3 rounded-lg text-sm outline-none bg-transparent">
+    </div>
+
+    <div id="polList" class="space-y-4">${listaPoliticas()}</div>
+  </div>`;
+}
+
+function listaPoliticas() {
+  const q = state.polQ.toLowerCase();
+  const list = DB.politicas.filter(p => {
+    if (!q) return true;
+    const texto = `${p.titulo} ${p.categoria} ${p.articulos.map(a => a.n + ' ' + a.titulo + ' ' + a.texto).join(' ')}`.toLowerCase();
+    return texto.includes(q);
+  });
+
+  if (!list.length) return emptyState('Sin resultados', 'No se encontraron políticas que coincidan con la búsqueda.');
+
+  return list.map(p => {
+    const abierto = state.polOpen === p.id;
+    const arts = q
+      ? p.articulos.filter(a => `${a.n} ${a.titulo} ${a.texto}`.toLowerCase().includes(q))
+      : p.articulos;
+    const firmas = p.conformidades || [];
+    const faltan = DB.empleados.filter(e => !firmas.some(f => f.empleadoId === e.id));
+    return `
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <button data-act="polToggle" data-id="${p.id}" class="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-slate-50 transition">
+          <div class="w-11 h-11 rounded-xl bg-corp-50 text-corp-600 grid place-items-center shrink-0">${icon('book','w-5 h-5')}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <h4 class="font-bold text-slate-800">${esc(p.titulo)}</h4>
+              ${p.obligatoria ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-100 text-accent-700">OBLIGATORIA</span>' : ''}
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">${esc(p.categoria)} · ${esc(p.version)} · Actualizado ${fmt(p.fechaActualizacion)} · ${p.articulos.length} artículos</p>
+          </div>
+          <div class="hidden sm:flex items-center gap-3 shrink-0">
+            <div class="text-right">
+              <p class="text-[11px] text-slate-400">Conformidades</p>
+              <p class="text-sm font-bold ${firmas.length === DB.empleados.length ? 'text-emerald-600' : 'text-amber-600'}">${firmas.length}/${DB.empleados.length}</p>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 transition-transform ${abierto ? 'rotate-180' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </button>
+        <div id="pol-body-${p.id}" class="${abierto ? '' : 'hidden'} border-t border-slate-200 bg-slate-50/50">
+          <div class="p-5 space-y-3">
+            ${arts.length ? arts.map(a => `
+              <div class="bg-white rounded-lg border border-slate-200 p-4">
+                <p class="text-xs font-bold text-accent-600 uppercase tracking-wide">${esc(a.n)}</p>
+                <p class="font-semibold text-slate-800 text-sm mt-0.5">${esc(a.titulo)}</p>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed text-justify">${esc(a.texto)}</p>
+              </div>`).join('') : '<p class="text-sm text-slate-500 italic">No hay artículos que coincidan con la búsqueda dentro de esta política.</p>'}
+
+            <div class="bg-white rounded-lg border border-slate-200 p-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p class="font-semibold text-slate-700 text-sm flex items-center gap-2">${icon('check','w-4 h-4 text-emerald-600')} Lectura y Conformidad Confirmada</p>
+                  <p class="text-xs text-slate-500 mt-1">Registre la confirmación de lectura del colaborador. La acción queda auditada con fecha y hora.</p>
+                </div>
+                <button data-act="firmarPol" data-id="${p.id}"
+                  class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition whitespace-nowrap">
+                  ${icon('check','w-4 h-4')} Confirmar lectura
+                </button>
+              </div>
+              ${firmas.length ? `<div class="mt-4 flex flex-wrap gap-2">
+                ${firmas.map(f => `<span class="inline-flex items-center gap-1.5 text-[11px] bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 px-2.5 py-1 rounded-full font-medium">
+                  ✓ ${esc(nombreEmp(f.empleadoId))} <span class="text-emerald-500">· ${fmtDT(f.fecha)}</span></span>`).join('')}
+              </div>` : '<p class="text-xs text-slate-400 mt-3 italic">Aún no hay conformidades registradas para este documento.</p>'}
+              ${faltan.length ? `<p class="text-[11px] text-amber-600 mt-3">Pendientes de confirmar: ${faltan.map(e => esc(e.nombre + ' ' + e.apellidos)).join(', ')}</p>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* =========================================================================
+   MÓDULO 5 — HERRAMIENTAS Y ADMINISTRACIÓN DEL SISTEMA
+   ========================================================================= */
+function viewHerramientas() {
+  const sizeBytes = new Blob([JSON.stringify(DB)]).size;
+  return `
+  <div class="space-y-5">
+    ${pageHeader('Herramientas y Administración del Sistema',
+      'Respaldos, restauración, carga masiva de datos y auditoría del sistema.')}
+
+    ${statCards([
+      { label: 'Empleados', value: DB.empleados.length, tone: 'corp' },
+      { label: 'Solicitudes', value: DB.solicitudes.length, tone: 'amber' },
+      { label: 'Candidatos', value: DB.candidatos.length, tone: 'violet' },
+      { label: 'Tamaño de la BD', value: bytes(sizeBytes), tone: 'green' }
+    ])}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+      <!-- Backup JSON -->
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-corp-50 text-corp-600 grid place-items-center">${icon('down','w-5 h-5')}</div>
+          <h4 class="font-bold text-slate-800">Gestión de Respaldos (Backup)</h4>
+        </div>
+        <p class="text-sm text-slate-500 leading-relaxed">Exporta la base de datos local completa en formato <strong>JSON estructurado</strong>: empleados, expedientes, documentos, solicitudes, candidatos, políticas y bitácora de auditoría.</p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button data-act="exportJSON" class="inline-flex items-center gap-2 bg-corp-600 hover:bg-corp-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+            ${icon('down','w-4 h-4')} Exportar respaldo JSON
+          </button>
+          <button data-act="exportCSVemp" class="inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-corp-400 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+            ${icon('down','w-4 h-4')} Empleados a CSV
+          </button>
+          <button data-act="exportCSVsol" class="inline-flex items-center gap-2 bg-white border border-slate-300 hover:border-corp-400 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+            ${icon('down','w-4 h-4')} Solicitudes a CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Restore JSON -->
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-accent-50 text-accent-600 grid place-items-center">${icon('up','w-5 h-5')}</div>
+          <h4 class="font-bold text-slate-800">Carga / Restauración de Respaldo</h4>
+        </div>
+        <p class="text-sm text-slate-500 leading-relaxed">Importa un archivo <strong>JSON</strong> previamente exportado para restaurar el estado completo de la aplicación. <span class="text-rose-600 font-semibold">La operación reemplaza la base de datos actual.</span></p>
+        <input type="file" id="jsonInput" accept=".json,application/json" class="hidden" onchange="importarJSON(this.files[0])">
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button onclick="document.getElementById('jsonInput').click()" class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+            ${icon('up','w-4 h-4')} Seleccionar respaldo JSON
+          </button>
+          <button data-act="resetDB" class="inline-flex items-center gap-2 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 text-sm font-semibold px-4 py-2.5 rounded-lg transition">
+            ${icon('trash','w-4 h-4')} Restablecer datos demo
+          </button>
+        </div>
+      </div>
+
+      <!-- Carga masiva -->
+      <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-lg bg-violet-50 text-violet-600 grid place-items-center">${icon('up','w-5 h-5')}</div>
+          <h4 class="font-bold text-slate-800">Carga Masiva (Bulk Import) — CSV / PDF</h4>
+        </div>
+        <p class="text-sm text-slate-500 leading-relaxed">Cargue listados de <strong>candidatos</strong> o <strong>empleados</strong> desde archivos CSV. También puede arrastrar un archivo PDF: el sistema realizará una <strong>lectura simulada</strong> y generará registros de previsualización. Siempre verá una tabla de previsualización antes de guardar.</p>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="doc-drop border-2 border-dashed border-slate-300 rounded-xl p-6 text-center transition"
+            ondragover="event.preventDefault();this.classList.add('dragover')"
+            ondragleave="this.classList.remove('dragover')"
+            ondrop="dropBulk(event)">
+            <div class="mx-auto w-12 h-12 rounded-full bg-violet-50 text-violet-600 grid place-items-center mb-3">${icon('up','w-6 h-6')}</div>
+            <p class="font-semibold text-slate-700 text-sm">Arrastra y suelta tu archivo CSV o PDF</p>
+            <p class="text-xs text-slate-500 mt-1">Columnas CSV sugeridas: nombre, email, telefono, puesto, habilidades, experiencia, educacion, fuente</p>
+            <input type="file" id="bulkInput" class="hidden" accept=".csv,.pdf,text/csv,application/pdf" onchange="procesarBulk(this.files[0])">
+            <button onclick="document.getElementById('bulkInput').click()" class="mt-4 inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+              ${icon('plus','w-4 h-4')} Seleccionar archivo
+            </button>
+          </div>
+          <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
+            <p class="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">Ejemplo de CSV válido</p>
+            <pre class="text-[11px] leading-relaxed text-slate-600 overflow-x-auto font-mono bg-white border border-slate-200 rounded-lg p-3">nombre,email,telefono,puesto,habilidades,experiencia,educacion,fuente
+Ana Pérez,ana@correo.com,+503 7777-0000,Analista,SQL;Excel,3,Lic. Administración,LinkedIn
+Juan López,juan@correo.com,+503 7888-1111,Contador,NIIF;SAP,5,Lic. Contaduría,Referido</pre>
+            <p class="text-[11px] text-slate-500 mt-2">Separe varias habilidades con punto y coma (;).</p>
+          </div>
+        </div>
+
+        <div id="bulkPreview" class="mt-5"></div>
+      </div>
+
+      <!-- Auditoría -->
+      <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 grid place-items-center">${icon('shield','w-5 h-5')}</div>
+            <div>
+              <h4 class="font-bold text-slate-800">Bitácora de Auditoría</h4>
+              <p class="text-xs text-slate-500">Últimas ${Math.min(DB.auditoria.length, 25)} operaciones registradas en el sistema.</p>
+            </div>
+          </div>
+          <button data-act="exportLog" class="text-xs font-semibold text-corp-600 hover:text-accent-600">Exportar bitácora →</button>
+        </div>
+        ${DB.auditoria.length ? `
+        <div class="overflow-x-auto max-h-80 overflow-y-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wide sticky top-0">
+              <tr><th class="text-left px-4 py-2.5">Fecha</th><th class="text-left px-4 py-2.5">Usuario</th><th class="text-left px-4 py-2.5">Acción</th><th class="text-left px-4 py-2.5">Detalle</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${DB.auditoria.slice(0, 25).map(l => `<tr class="hover:bg-slate-50">
+                <td class="px-4 py-2.5 text-slate-500 whitespace-nowrap">${fmtDT(l.fecha)}</td>
+                <td class="px-4 py-2.5 text-slate-600">${esc(l.usuario)}</td>
+                <td class="px-4 py-2.5"><span class="font-semibold text-corp-700">${esc(l.accion)}</span></td>
+                <td class="px-4 py-2.5 text-slate-600">${esc(l.detalle)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '<p class="text-sm text-slate-400 italic">Sin registros de auditoría.</p>'}
+      </div>
+
+    </div>
+  </div>`;
+}
+
+/* ------------------------------ EXPORT / IMPORT ------------------------------ */
+function exportarJSON() {
+  log('RESPALDO_EXPORTADO', 'Se exportó la base de datos completa en formato JSON.');
+  saveDB();
+  const payload = { ...DB, meta: { ...DB.meta, exportado: new Date().toISOString(), sistema: 'Talent360 Hub', autor: 'Carlos Alfredo Castillo Flores - ITCPO' } };
+  download(`Talent360Hub_backup_${hoy()}.json`, JSON.stringify(payload, null, 2));
+  toast('Respaldo JSON exportado correctamente.', 'ok');
+  render();
+}
+
+window.importarJSON = file => {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let data;
+    try { data = JSON.parse(e.target.result); }
+    catch (err) { toast('El archivo no es un JSON válido.', 'err'); return; }
+    if (!data || !Array.isArray(data.empleados)) { toast('Estructura inválida: falta el arreglo "empleados".', 'err'); return; }
+
+    const emp = data.empleados.length, sol = (data.solicitudes || []).length,
+          can = (data.candidatos || []).length, pol = (data.politicas || []).length;
+
+    openModal({
+      title: '⚠️ Confirmar restauración de respaldo',
+      body: `<div class="space-y-3">
+        <p class="text-sm text-slate-600">Está a punto de <strong>reemplazar la base de datos actual</strong> con el contenido del archivo:</p>
+        <p class="text-xs font-mono bg-slate-100 px-3 py-2 rounded-lg break-all">${esc(file.name)}</p>
+        <div class="grid grid-cols-2 gap-3 mt-2">
+          ${miniStat('Empleados', emp, 'corp', 'user')}
+          ${miniStat('Solicitudes', sol, 'amber', 'inbox')}
+          ${miniStat('Candidatos', can, 'violet', 'user')}
+          ${miniStat('Políticas', pol, 'green', 'book')}
+        </div>
+        <p class="text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-3 mt-2">Esta acción no se puede deshacer. Se recomienda exportar un respaldo de seguridad antes de continuar.</p>
+      </div>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+               <button id="btnConfirmImport" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white transition">Restaurar respaldo</button>`
+    });
+
+    document.getElementById('btnConfirmImport').onclick = () => {
+      const nuevo = defaultDB();
+      DB = {
+        meta: { ...nuevo.meta, ...(data.meta || {}), restaurado: new Date().toISOString() },
+        empleados: data.empleados || [],
+        solicitudes: data.solicitudes || [],
+        candidatos: data.candidatos || [],
+        politicas: data.politicas || [],
+        auditoria: data.auditoria || []
+      };
+      state.empSel = null; state.polOpen = null;
+      log('RESPALDO_RESTAURADO', `Base de datos restaurada desde "${file.name}".`);
+      saveDB();
+      closeModal();
+      render();
+      toast('Base de datos restaurada correctamente.', 'ok');
+    };
+  };
+  reader.readAsText(file);
+};
+
+/* ------------------------------ CSV ------------------------------ */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQ = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c !== '\r') field += c;
+    }
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(c => String(c).trim() !== ''));
+}
+
+function toCSV(headers, rows) {
+  const escC = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+  return '\uFEFF' + [headers.map(escC).join(','), ...rows.map(r => r.map(escC).join(','))].join('\r\n');
+}
+
+function exportarEmpleadosCSV() {
+  const headers = ['id','nombre','apellidos','email','telefono','departamento','puesto','jefe','fechaIngreso','tipoContrato','salario','estado','vacacionesAsignadas','competencias','capacitaciones'];
+  const rows = DB.empleados.map(e => [
+    e.id, e.nombre, e.apellidos, e.email, e.telefono, e.departamento, e.puesto, e.jefe, e.fechaIngreso,
+    e.tipoContrato, e.salario, e.estado, e.vacacionesAsignadas,
+    (e.competencias || []).map(c => `${c.nombre}(${c.nivel})`).join('; '),
+    (e.capacitaciones || []).map(c => c.nombre).join('; ')
+  ]);
+  download(`Talent360_Empleados_${hoy()}.csv`, toCSV(headers, rows), 'text/csv');
+  log('EXPORT_CSV', `Se exportaron ${rows.length} empleados a CSV.`);
+  saveDB(); render();
+  toast('Listado de empleados exportado en CSV.', 'ok');
+}
+
+function exportarSolicitudesCSV() {
+  const headers = ['id','empleadoId','empleado','tipo','fechaInicio','fechaFin','dias','estado','fechaSolicitud','resueltoPor','motivo','comentario'];
+  const rows = DB.solicitudes.map(s => [
+    s.id, s.empleadoId, nombreEmp(s.empleadoId), s.tipo, s.fechaInicio, s.fechaFin, s.dias,
+    s.estado, s.fechaSolicitud, s.resueltoPor || '', s.motivo || '', s.comentario || ''
+  ]);
+  download(`Talent360_Solicitudes_${hoy()}.csv`, toCSV(headers, rows), 'text/csv');
+  log('EXPORT_CSV', `Se exportaron ${rows.length} solicitudes a CSV.`);
+  saveDB(); render();
+  toast('Listado de solicitudes exportado en CSV.', 'ok');
+}
+
+/* ------------------------------ CARGA MASIVA ------------------------------ */
+window.dropBulk = ev => {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('dragover');
+  const f = ev.dataTransfer?.files?.[0];
+  if (f) procesarBulk(f);
+};
+
+window.procesarBulk = file => {
+  if (!file) return;
+  const esPDF = /\.pdf$/i.test(file.name) || file.type === 'application/pdf';
+  const esCSV = /\.csv$/i.test(file.name) || file.type === 'text/csv';
+
+  if (!esPDF && !esCSV) { toast('Formato no soportado. Utilice CSV o PDF.', 'err'); return; }
+
+  const cont = document.getElementById('bulkPreview');
+  cont.innerHTML = `
+    <div class="border border-slate-200 rounded-xl p-6 bg-slate-50">
+      <p class="text-sm font-semibold text-slate-700 mb-3">Procesando <span class="font-mono text-xs">${esc(file.name)}</span>…</p>
+      <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
+        <div id="bulkBar" class="h-full bg-violet-600 rounded-full transition-all duration-300" style="width:5%"></div>
+      </div>
+      <p id="bulkMsg" class="text-xs text-slate-500 mt-2">Iniciando lectura del archivo…</p>
+    </div>`;
+
+  const pasos = esPDF
+    ? ['Abriendo documento PDF…', 'Extrayendo texto de la capa superficial…', 'Identificando campos: nombre, correo, teléfono…', 'Normalizando habilidades y experiencia…', 'Generando registros de previsualización…']
+    : ['Leyendo archivo CSV…', 'Detectando delimitador y encabezados…', 'Validando columnas requeridas…', 'Normalizando registros…', 'Generando previsualización…'];
+
+  let i = 0;
+  const timer = setInterval(() => {
+    i++;
+    const bar = document.getElementById('bulkBar');
+    const msg = document.getElementById('bulkMsg');
+    if (!bar) { clearInterval(timer); return; }
+    bar.style.width = Math.min(95, 5 + i * 20) + '%';
+    msg.textContent = pasos[Math.min(i - 1, pasos.length - 1)];
+    if (i >= pasos.length) {
+      clearInterval(timer);
+      bar.style.width = '100%';
+      setTimeout(() => {
+        if (esPDF) finalizarBulkPDF(file);
+        else finalizarBulkCSV(file);
+      }, 400);
+    }
+  }, 320);
+};
+
+function finalizarBulkCSV(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rows = parseCSV(e.target.result);
+    if (rows.length < 2) { toast('El CSV no contiene datos suficientes.', 'err'); document.getElementById('bulkPreview').innerHTML = ''; return; }
+    const headers = rows[0].map(h => h.trim().toLowerCase());
+    const data = rows.slice(1).map(r => {
+      const o = {};
+      headers.forEach((h, i) => o[h] = (r[i] || '').trim());
+      return o;
+    });
+    state.bulk = { tipo: 'candidatos', archivo: file.name, headers, rows: data };
+    renderBulkPreview();
+  };
+  reader.readAsText(file);
+}
+
+function finalizarBulkPDF(file) {
+  // Lectura simulada: se generan registros plausibles derivados del nombre del archivo.
+  const base = file.name.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ').trim();
+  const demo = [
+    { nombre: 'Candidato Extraído 1 · ' + base, email: 'candidato1@correo.com', telefono: '+503 7000-0001', puesto: 'Analista Administrativo', habilidades: 'Excel; Atención al detalle', experiencia: '3', educacion: 'Lic. Administración', fuente: 'PDF (lectura simulada)' },
+    { nombre: 'Candidato Extraído 2 · ' + base, email: 'candidato2@correo.com', telefono: '+503 7000-0002', puesto: 'Técnico de Soporte', habilidades: 'Redes; Hardware', experiencia: '2', educacion: 'Técnico en Informática', fuente: 'PDF (lectura simulada)' },
+    { nombre: 'Candidato Extraído 3 · ' + base, email: 'candidato3@correo.com', telefono: '+503 7000-0003', puesto: 'Asistente Contable', habilidades: 'NIIF; SAP', experiencia: '4', educacion: 'Lic. Contaduría', fuente: 'PDF (lectura simulada)' }
+  ];
+  const headers = ['nombre','email','telefono','puesto','habilidades','experiencia','educacion','fuente'];
+  state.bulk = { tipo: 'candidatos', archivo: file.name, headers, rows: demo, simulado: true };
+  renderBulkPreview();
+}
+
+function renderBulkPreview() {
+  const b = state.bulk;
+  const cont = document.getElementById('bulkPreview');
+  if (!b) { cont.innerHTML = ''; return; }
+
+  cont.innerHTML = `
+    <div class="border border-violet-200 rounded-xl overflow-hidden bg-white">
+      <div class="px-4 py-3 bg-violet-50 border-b border-violet-200 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-bold text-violet-800">Previsualización de carga masiva ${b.simulado ? '(lectura simulada de PDF)' : '(CSV)'}</p>
+          <p class="text-[11px] text-violet-600">${b.rows.length} registro(s) detectado(s) en <span class="font-mono">${esc(b.archivo)}</span>. Revise y confirme antes de guardar.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="cancelarBulk()" class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition">Cancelar</button>
+          <button onclick="confirmarBulk()" class="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 transition">Guardar seleccionados</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto max-h-80 overflow-y-auto">
+        <table class="w-full text-xs">
+          <thead class="bg-slate-50 text-slate-500 uppercase tracking-wide sticky top-0">
+            <tr>
+              <th class="px-3 py-2.5 text-center w-10"><input type="checkbox" checked onchange="toggleAllBulk(this.checked)" class="rounded"></th>
+              ${b.headers.map(h => `<th class="text-left px-3 py-2.5 whitespace-nowrap">${esc(h)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${b.rows.map((r, i) => `
+              <tr class="hover:bg-slate-50">
+                <td class="px-3 py-2 text-center"><input type="checkbox" class="bulkChk rounded" data-idx="${i}" checked></td>
+                ${b.headers.map(h => `<td class="px-3 py-2 text-slate-600 whitespace-nowrap">${esc(r[h] || '')}</td>`).join('')}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+window.toggleAllBulk = chk => $$('.bulkChk').forEach(c => c.checked = chk);
+window.cancelarBulk = () => { state.bulk = null; renderBulkPreview(); toast('Carga masiva cancelada.', 'info'); };
+window.confirmarBulk = () => {
+  const b = state.bulk;
+  if (!b) return;
+  const idxs = $$('.bulkChk').filter(c => c.checked).map(c => parseInt(c.dataset.idx, 10));
+  if (!idxs.length) { toast('Debe seleccionar al menos un registro.', 'warn'); return; }
+
+  let creados = 0;
+  idxs.forEach(i => {
+    const r = b.rows[i];
+    if (b.tipo === 'candidatos') {
+      DB.candidatos.unshift({
+        id: uid('CAN'),
+        nombre: r.nombre || 'Sin nombre',
+        email: r.email || '',
+        telefono: r.telefono || '',
+        puesto: r.puesto || 'No especificado',
+        fuente: r.fuente || 'Carga masiva CSV',
+        estado: 'En Revisión',
+        habilidades: String(r.habilidades || '').split(/[;|]/).map(s => s.trim()).filter(Boolean),
+        experiencia: parseInt(r.experiencia, 10) || 0,
+        educacion: r.educacion || '',
+        cvNombre: b.archivo,
+        fechaRegistro: hoy(),
+        notas: ''
+      });
+      creados++;
+    }
+  });
+
+  log('CARGA_MASIVA', `${creados} candidato(s) importado(s) desde "${b.archivo}".`);
+  state.bulk = null;
+  saveDB();
+  render();
+  toast(`${creados} registro(s) importado(s) correctamente.`, 'ok');
+};
+
+/* =========================================================================
+   MÓDULO 6 — AYUDA Y ASPECTOS LEGALES
+   ========================================================================= */
+function viewAyuda() {
+  return `
+  <div class="space-y-5 max-w-5xl">
+    ${pageHeader('Ayuda, Guía de Uso y Aspectos Legales',
+      'Documentación funcional del sistema, buenas prácticas, términos de servicio y política de privacidad.')}
+
+    <!-- Guía rápida -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-bold text-slate-800 flex items-center gap-2 mb-4">${icon('help','w-5 h-5 text-accent-500')} Funciones clave: Importación y Exportación</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        ${helpCard('📤','Exportar respaldo JSON',
+          'Genera un archivo <strong>.json</strong> con la totalidad de la base de datos: empleados, expedientes, documentos adjuntos, solicitudes, candidatos, políticas y bitácora de auditoría. Úselo como respaldo periódico y para migrar la información entre equipos o navegadores.',
+          'Herramientas y Admin → Exportar respaldo JSON')}
+        ${helpCard('📥','Importar respaldo JSON',
+          'Restaura el estado completo de la aplicación a partir de un archivo JSON exportado previamente. <strong>Reemplaza</strong> la base local actual. El sistema valida la estructura y muestra un resumen antes de confirmar. Se recomienda exportar un respaldo de seguridad antes de restaurar.',
+          'Herramientas y Admin → Seleccionar respaldo JSON')}
+        ${helpCard('📊','Carga masiva CSV / PDF',
+          'Importa listados de candidatos o empleados desde un archivo <strong>CSV</strong> (columnas: nombre, email, telefono, puesto, habilidades, experiencia, educacion, fuente) o desde un <strong>PDF</strong> mediante lectura simulada. Siempre se muestra una tabla de previsualización con casillas de selección antes de guardar los registros.',
+          'Herramientas y Admin → Carga Masiva')}
+      </div>
+    </div>
+
+    <!-- Preguntas frecuentes -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-bold text-slate-800 mb-4">Preguntas frecuentes</h3>
+      <div class="space-y-3">
+        ${faq('¿Dónde se almacena la información?',
+          'Todos los datos se guardan en el <strong>almacenamiento local del navegador</strong> (localStorage) bajo la clave <code class="bg-slate-100 px-1.5 py-0.5 rounded text-xs">talent360hub_db_v1</code>. No se envía información a servidores externos. Si limpia los datos del navegador, la información se perderá: por ello se recomienda exportar respaldos JSON periódicamente.')}
+        ${faq('¿Qué formatos de documento acepta el expediente?',
+          'PDF e imágenes (JPG, PNG y WEBP). Los archivos de hasta 2 MB se almacenan íntegramente y permiten previsualización y descarga. Los archivos mayores conservan únicamente sus metadatos para no agotar el almacenamiento local.')}
+        ${faq('¿Cómo funciona el flujo de aprobación de solicitudes?',
+          'Toda solicitud nace en estado <span class="font-semibold text-amber-600">Pendiente</span>. Desde la tabla puede aprobarse (<span class="font-semibold text-emerald-600">Aprobado</span>) o rechazarse (<span class="font-semibold text-rose-600">Rechazado</span>). Al aprobar una solicitud de vacaciones, el sistema descuenta automáticamente los días del saldo del colaborador.')}
+        ${faq('¿Puedo exportar solo algunos datos?',
+          'Sí. Además del respaldo JSON completo, puede exportar el listado de empleados o el de solicitudes en formato <strong>CSV</strong>, compatible con Excel, Google Sheets y otras herramientas de análisis.')}
+        ${faq('¿La confirmación de lectura de políticas tiene validez?',
+          'El sistema registra la confirmación con la identidad del colaborador y la marca temporal (fecha y hora) en la bitácora de auditoría. Para efectos legales plenos, se recomienda complementar con firma electrónica certificada o documento físico según la normativa aplicable.')}
+      </div>
+    </div>
+
+    <!-- Legal -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">${icon('shield','w-5 h-5 text-corp-600')} Aspectos legales a cumplir</h3>
+        <ul class="space-y-3 text-sm text-slate-600 leading-relaxed">
+          ${legalItem('Protección de datos personales', 'El tratamiento de datos de empleados y candidatos debe realizarse conforme a la Ley de Protección de Datos Personales aplicable, con base en los principios de licitud, finalidad, proporcionalidad, calidad, seguridad y confidencialidad.')}
+          ${legalItem('Consentimiento informado', 'Se debe informar previamente al titular sobre la finalidad del tratamiento de sus datos y obtener su consentimiento cuando la ley lo exija, especialmente para datos sensibles.')}
+          ${legalItem('Derechos ARCO', 'Todo titular puede ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición sobre sus datos personales, mediante el procedimiento que la organización establezca.')}
+          ${legalItem('Legislación laboral', 'El uso del módulo de vacaciones, permisos y licencias debe alinearse con el Código de Trabajo vigente y con el Reglamento Interno de Trabajo de la organización.')}
+          ${legalItem('Confidencialidad y secreto profesional', 'Quienes administren el sistema están obligados a guardar reserva sobre la información a la que accedan, incluso después de finalizada su relación laboral.')}
+          ${legalItem('Seguridad de la información', 'Se deben implementar medidas técnicas y organizativas apropiadas: control de acceso, respaldos cifrados y registro de auditoría de las operaciones.')}
+          ${legalItem('No discriminación', 'El uso de los datos de reclutamiento no podrá generar discriminación por género, edad, religión, etnia, discapacidad, orientación sexual o cualquier otra condición protegida.')}
+          ${legalItem('Conservación y eliminación', 'Los datos se conservarán únicamente durante el tiempo necesario para cumplir la finalidad informada y las obligaciones legales, tras lo cual deberán eliminarse de forma segura.')}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">${icon('doc','w-5 h-5 text-accent-500')} Términos de servicio</h3>
+        <ol class="space-y-3 text-sm text-slate-600 leading-relaxed list-decimal list-inside">
+          <li><strong>Aceptación.</strong> El uso de Talent360 Hub implica la aceptación plena de estos términos por parte de la organización usuaria y de las personas autorizadas.</li>
+          <li><strong>Licencia de uso.</strong> Se concede una licencia de uso interna, no exclusiva e intransferible, limitada a las operaciones de gestión de personal de la organización.</li>
+          <li><strong>Uso autorizado.</strong> El acceso está restringido al personal de Recursos Humanos y a las jefaturas debidamente autorizadas. Las credenciales son personales e intransferibles.</li>
+          <li><strong>Responsabilidad del usuario.</strong> El usuario es responsable de la veracidad de los datos que registra y del uso conforme a la ley que haga de la herramienta.</li>
+          <li><strong>Disponibilidad.</strong> Al tratarse de una aplicación que opera en el navegador con almacenamiento local, la disponibilidad depende del equipo y del navegador del usuario.</li>
+          <li><strong>Respaldos.</strong> Es responsabilidad de la organización generar respaldos periódicos mediante la función de exportación JSON. El proveedor no asume responsabilidad por pérdida de datos derivada de la falta de respaldos.</li>
+          <li><strong>Modificaciones.</strong> El proveedor podrá actualizar funcionalidades y estos términos, notificando los cambios relevantes a la organización usuaria.</li>
+          <li><strong>Terminación.</strong> El incumplimiento de estos términos faculta a suspender el acceso a la herramienta.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">${icon('shield','w-5 h-5 text-emerald-600')} Política de privacidad y garantía de privacidad de los usuarios</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-slate-600 leading-relaxed">
+        <div class="space-y-3">
+          <p><strong class="text-slate-700">1. Minimización de datos.</strong> El sistema solicita únicamente los datos estrictamente necesarios para la gestión de personal, talento y reclutamiento.</p>
+          <p><strong class="text-slate-700">2. Almacenamiento local.</strong> La información permanece en el dispositivo del usuario. No existe transmisión automática a terceros ni servicios en la nube.</p>
+          <p><strong class="text-slate-700">3. Control del titular.</strong> El colaborador puede solicitar el acceso, la corrección o la eliminación de su información ante el área de Recursos Humanos.</p>
+          <p><strong class="text-slate-700">4. Trazabilidad.</strong> Cada operación sensible queda registrada en la bitácora de auditoría con usuario, acción, detalle y marca temporal.</p>
+        </div>
+        <div class="space-y-3">
+          <p><strong class="text-slate-700">5. Confidencialidad.</strong> Los datos de candidatos se utilizan exclusivamente para procesos de selección y se conservan por el tiempo que dure el proceso y el plazo legal aplicable.</p>
+          <p><strong class="text-slate-700">6. Seguridad técnica.</strong> Se recomienda el uso de equipos con cifrado de disco, control de acceso por contraseña y respaldos almacenados en repositorios autorizados.</p>
+          <p><strong class="text-slate-700">7. No cesión.</strong> No se cederán datos personales a terceros sin base legal o consentimiento expreso del titular.</p>
+          <p><strong class="text-slate-700">8. Incidencias.</strong> Ante cualquier brecha de seguridad, la organización deberá notificar a los titulares afectados y a la autoridad competente conforme a la ley.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Derechos de autor -->
+    <div class="bg-gradient-to-r from-corp-800 to-corp-900 rounded-xl p-6 text-white">
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-5">
+        <div class="w-16 h-16 rounded-2xl bg-accent-500 grid place-items-center font-black text-2xl shrink-0">T3</div>
+        <div class="flex-1">
+          <h3 class="font-bold text-lg">Talent360 Hub — Sistema Integral de Gestión de Personal, Talento y RRHH</h3>
+          <p class="text-sm text-corp-100/90 mt-1">© 2026 <strong>Carlos Alfredo Castillo Flores</strong> — ITCPO. Todos los derechos reservados.</p>
+          <p class="text-xs text-corp-200/70 mt-2 leading-relaxed">Queda prohibida la reproducción, distribución, comunicación pública o transformación total o parcial de este software sin la autorización expresa y por escrito del titular de los derechos. El uso no autorizado podrá dar lugar a las responsabilidades civiles y penales previstas en la legislación aplicable en materia de propiedad intelectual.</p>
+          <p class="text-xs font-bold text-accent-400 mt-3 powered inline-block">Powered by ITCPO</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bitácora rápida -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-bold text-slate-800 mb-3">Últimas operaciones registradas</h3>
+      ${DB.auditoria.length ? `<div class="space-y-2">
+        ${DB.auditoria.slice(0, 8).map(l => `
+          <div class="flex items-start gap-3 text-xs border-b border-slate-100 pb-2 last:border-0">
+            <span class="text-slate-400 whitespace-nowrap">${fmtDT(l.fecha)}</span>
+            <span class="font-semibold text-corp-700 whitespace-nowrap">${esc(l.accion)}</span>
+            <span class="text-slate-600">${esc(l.detalle)}</span>
+          </div>`).join('')}
+      </div>` : '<p class="text-sm text-slate-400 italic">Sin registros.</p>'}
+    </div>
+  </div>`;
+}
+
+function helpCard(emoji, title, text, where) {
+  return `<div class="border border-slate-200 rounded-xl p-4 bg-slate-50 hover:bg-white hover:shadow-sm transition">
+    <div class="text-2xl mb-2">${emoji}</div>
+    <h4 class="font-bold text-slate-800 text-sm mb-1.5">${title}</h4>
+    <p class="text-xs text-slate-600 leading-relaxed">${text}</p>
+    <p class="text-[11px] font-semibold text-accent-600 mt-3">📍 ${where}</p>
+  </div>`;
+}
+function faq(q, a) {
+  return `<details class="group border border-slate-200 rounded-lg overflow-hidden">
+    <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center justify-between list-none">
+      ${q}
+      <span class="text-slate-400 group-open:rotate-180 transition-transform">▾</span>
+    </summary>
+    <div class="px-4 pb-4 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">${a}</div>
+  </details>`;
+}
+function legalItem(t, d) {
+  return `<li class="flex gap-3">
+    <span class="text-emerald-600 font-bold shrink-0 mt-0.5">§</span>
+    <span><strong class="text-slate-700">${t}.</strong> ${d}</span>
+  </li>`;
+}
+
+/* =========================================================================
+   COMPONENTES DE UI REUTILIZABLES
+   ========================================================================= */
+function pageHeader(title, sub, actions = '') {
+  return `<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h3 class="text-xl font-bold text-slate-800">${title}</h3>
+      <p class="text-sm text-slate-500 mt-0.5">${sub}</p>
+    </div>
+    ${actions ? `<div class="flex flex-wrap gap-2">${actions}</div>` : ''}
+  </div>`;
+}
+
+const TONES = {
+  corp:   'bg-corp-50 text-corp-700 ring-corp-200',
+  green:  'bg-emerald-50 text-emerald-700 ring-emerald-200',
+  amber:  'bg-amber-50 text-amber-700 ring-amber-200',
+  red:    'bg-rose-50 text-rose-700 ring-rose-200',
+  violet: 'bg-violet-50 text-violet-700 ring-violet-200',
+  orange: 'bg-accent-50 text-accent-700 ring-accent-200',
+  blue:   'bg-sky-50 text-sky-700 ring-sky-200'
+};
+function statCards(items) {
+  return `<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    ${items.map(i => `
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">${i.label}</p>
+        <p class="text-2xl font-bold text-slate-800 mt-1">${i.value}</p>
+      </div>`).join('')}
+  </div>`;
+}
+function miniStat(label, value, tone = 'corp', ic = 'chart') {
+  return `<div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-lg grid place-items-center ring-1 ${TONES[tone] || TONES.corp} shrink-0">${icon(ic,'w-5 h-5')}</div>
+    <div class="min-w-0">
+      <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold truncate">${label}</p>
+      <p class="text-lg font-bold text-slate-800 leading-tight">${value}</p>
+    </div>
+  </div>`;
+}
+function emptyState(title, msg) {
+  return `<div class="text-center py-12 px-6 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+    <div class="mx-auto w-14 h-14 rounded-full bg-white border border-slate-200 grid place-items-center text-slate-400 mb-3">
+      ${icon('search','w-6 h-6')}
+    </div>
+    <p class="font-semibold text-slate-600">${title}</p>
+    <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">${msg}</p>
+  </div>`;
+}
+function formRow(label, inputHtml, span = 1) {
+  return `<div class="${span === 2 ? 'md:col-span-2' : ''}">
+    <label class="block text-xs font-semibold text-slate-600 mb-1">${label}</label>
+    ${inputHtml}
+  </div>`;
+}
+const INPUT_CLS = 'w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm outline-none focus:border-corp-500 focus:ring-2 focus:ring-corp-500/30 bg-white';
+
+/* =========================================================================
+   ACCIONES (delegación de eventos)
+   ========================================================================= */
+const ACTIONS = {
+  nav: el => { state.view = el.dataset.view; state.empSel = null; state.polOpen = null; closeSidebar(); render(); },
+  closeModal: () => closeModal(),
+
+  /* --- Expediente --- */
+  viewEmp: el => { state.view = 'expediente'; state.empSel = el.dataset.id; state.empTab = 'datos'; closeSidebar(); render(); },
+  backEmp: () => { state.empSel = null; state.empTab = 'datos'; render(); },
+  empTab: el => { state.empTab = el.dataset.tab; render(); },
+  newEmp: () => modalEmpleado(null),
+  editEmp: el => modalEmpleado(el.dataset.id),
+
+  delEmp: el => {
+    const e = getEmp(el.dataset.id);
+    if (!e) return;
+    openModal({
+      title: 'Eliminar colaborador',
+      body: `<p class="text-sm text-slate-600">¿Confirma la eliminación de <strong>${esc(e.nombre)} ${esc(e.apellidos)}</strong>? Se eliminarán también sus solicitudes asociadas y sus documentos. Esta acción no se puede deshacer.</p>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+               <button id="btnDelEmp" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white transition">Eliminar definitivamente</button>`
+    });
+    document.getElementById('btnDelEmp').onclick = () => {
+      DB.empleados = DB.empleados.filter(x => x.id !== e.id);
+      DB.solicitudes = DB.solicitudes.filter(s => s.empleadoId !== e.id);
+      log('EMPLEADO_ELIMINADO', `${e.nombre} ${e.apellidos} (${e.id}) eliminado del sistema.`);
+      state.empSel = null;
+      saveDB(); closeModal(); render();
+      toast('Colaborador eliminado.', 'ok');
+    };
+  },
+
+  pickDoc: () => window.pickDoc(),
+  prevDoc: el => {
+    const emp = getEmp(el.dataset.emp);
+    const d = emp?.documentos?.find(x => x.id === el.dataset.id);
+    if (!d) return;
+    const esPdf = (d.tipo || '').includes('pdf') || /\.pdf$/i.test(d.nombre);
+    let contenido;
+    if (!d.data) {
+      contenido = `<div class="text-center py-14 px-6 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+        <div class="mx-auto w-14 h-14 rounded-full bg-white border border-slate-200 grid place-items-center text-slate-400 mb-3">${icon('doc','w-6 h-6')}</div>
+        <p class="font-semibold text-slate-600">Vista previa no disponible</p>
+        <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">Este registro es un <strong>documento de ejemplo</strong> o su archivo superó el límite de 2 MB, por lo que solo se conservaron los metadatos. Cargue el archivo real para habilitar la previsualización.</p>
+      </div>`;
+    } else if (esPdf) {
+      contenido = `<iframe src="${d.data}" class="w-full h-[68vh] rounded-xl border border-slate-200 bg-slate-100"></iframe>`;
+    } else {
+      contenido = `<div class="bg-slate-100 rounded-xl p-4 flex items-center justify-center"><img src="${d.data}" alt="${esc(d.nombre)}" class="max-h-[66vh] max-w-full rounded-lg shadow"></div>`;
+    }
+    openModal({
+      title: `📄 ${esc(d.nombre)}`,
+      body: `<div class="space-y-3">
+        <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+          <span><strong class="text-slate-700">Empleado:</strong> ${esc(emp.nombre)} ${esc(emp.apellidos)}</span>
+          <span><strong class="text-slate-700">Tamaño:</strong> ${bytes(d.size)}</span>
+          <span><strong class="text-slate-700">Cargado:</strong> ${fmt(d.fecha)}</span>
+        </div>
+        ${contenido}
+      </div>`,
+      footer: `${d.data ? `<button id="btnDlDoc" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-corp-600 hover:bg-corp-700 text-white transition">Descargar</button>` : ''}
+               <button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cerrar</button>`,
+      size: 'max-w-4xl'
+    });
+    const btn = document.getElementById('btnDlDoc');
+    if (btn) btn.onclick = () => { const a = document.createElement('a'); a.href = d.data; a.download = d.nombre; a.click(); };
+  },
+  dlDoc: el => {
+    const emp = getEmp(el.dataset.emp);
+    const d = emp?.documentos?.find(x => x.id === el.dataset.id);
+    if (!d?.data) return;
+    const a = document.createElement('a'); a.href = d.data; a.download = d.nombre; a.click();
+  },
+  delDoc: el => {
+    const emp = getEmp(el.dataset.emp);
+    if (!emp) return;
+    emp.documentos = (emp.documentos || []).filter(x => x.id !== el.dataset.id);
+    commit('DOCUMENTO_ELIMINADO', `Documento eliminado del expediente de ${emp.nombre} ${emp.apellidos}.`, true);
+    render(); toast('Documento eliminado.', 'ok');
+  },
+
+  newCap: () => {
+    openModal({
+      title: 'Registrar capacitación',
+      body: `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        ${formRow('Nombre de la capacitación *', `<input id="capNombre" class="${INPUT_CLS}" placeholder="Ej. Gestión de Proyectos">`, 2)}
+        ${formRow('Institución', `<input id="capInst" class="${INPUT_CLS}" placeholder="Ej. ITCPO Academy">`)}
+        ${formRow('Fecha', `<input id="capFecha" type="date" value="${hoy()}" class="${INPUT_CLS}">`)}
+        ${formRow('Horas', `<input id="capHoras" type="number" min="1" value="8" class="${INPUT_CLS}">`)}
+        ${formRow('Estado', `<select id="capEstado" class="${INPUT_CLS}"><option>Completado</option><option>En curso</option><option>Pendiente</option></select>`)}
+      </div>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+               <button id="btnSaveCap" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-accent-500 hover:bg-accent-600 text-white transition">Guardar capacitación</button>`
+    });
+    document.getElementById('btnSaveCap').onclick = () => {
+      const n = v('capNombre');
+      if (!n) { toast('El nombre de la capacitación es obligatorio.', 'warn'); return; }
+      const emp = getEmp(state.empSel);
+      if (!emp) return;
+      emp.capacitaciones = emp.capacitaciones || [];
+      emp.capacitaciones.unshift({ id: uid('CAP'), nombre: n, institucion: v('capInst'), fecha: v('capFecha'), horas: num('capHoras'), estado: v('capEstado') });
+      commit('CAPACITACION_REGISTRADA', `"${n}" registrada para ${emp.nombre} ${emp.apellidos}.`, true);
+      closeModal(); render(); toast('Capacitación registrada.', 'ok');
+    };
+  },
+  delCap: el => {
+    const emp = getEmp(state.empSel);
+    if (!emp) return;
+    emp.capacitaciones = (emp.capacitaciones || []).filter(c => c.id !== el.dataset.id);
+    commit('CAPACITACION_ELIMINADA', `Capacitación eliminada del expediente de ${emp.nombre}.`, true);
+    render(); toast('Capacitación eliminada.', 'ok');
+  },
+
+  newComp: () => {
+    openModal({
+      title: 'Agregar competencia clave',
+      body: `<div class="space-y-4">
+        ${formRow('Nombre de la competencia *', `<input id="compNombre" class="${INPUT_CLS}" placeholder="Ej. Liderazgo, SQL, Negociación">`)}
+        ${formRow('Nivel de dominio (1 a 5)', `<input id="compNivel" type="range" min="1" max="5" value="3" class="w-full accent-orange-500" oninput="document.getElementById('compNivelVal').textContent=this.value">
+          <p class="text-xs text-slate-500 mt-1">Nivel seleccionado: <span id="compNivelVal" class="font-bold text-accent-600">3</span> / 5</p>`)}
+      </div>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+               <button id="btnSaveComp" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-accent-500 hover:bg-accent-600 text-white transition">Agregar competencia</button>`
+    });
+    document.getElementById('btnSaveComp').onclick = () => {
+      const n = v('compNombre');
+      if (!n) { toast('El nombre de la competencia es obligatorio.', 'warn'); return; }
+      const emp = getEmp(state.empSel);
+      if (!emp) return;
+      emp.competencias = emp.competencias || [];
+      if (emp.competencias.some(c => c.nombre.toLowerCase() === n.toLowerCase())) { toast('Esa competencia ya está registrada.', 'warn'); return; }
+      emp.competencias.push({ nombre: n, nivel: parseInt(v('compNivel'), 10) || 3 });
+      commit('COMPETENCIA_AGREGADA', `Competencia "${n}" agregada a ${emp.nombre} ${emp.apellidos}.`, true);
+      closeModal(); render(); toast('Competencia agregada.', 'ok');
+    };
+  },
+  delComp: el => {
+    const emp = getEmp(state.empSel);
+    if (!emp) return;
+    emp.competencias = (emp.competencias || []).filter(c => c.nombre !== el.dataset.id);
+    commit('COMPETENCIA_ELIMINADA', `Competencia eliminada del expediente de ${emp.nombre}.`, true);
+    render();
+  },
+
+  /* --- Solicitudes --- */
+  newSol: () => modalSolicitud(),
+  verSol: el => {
+    const s = DB.solicitudes.find(x => x.id === el.dataset.id);
+    if (!s) return;
+    const emp = getEmp(s.empleadoId);
+    openModal({
+      title: `Solicitud ${esc(s.id)}`,
+      body: `<div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-bold text-slate-800">${esc(nombreEmp(s.empleadoId))}</p>
+            <p class="text-xs text-slate-500">${esc(emp?.puesto || '')} · ${esc(emp?.departamento || '')}</p>
+          </div>
+          ${badge(s.estado)}
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          ${field('Tipo de solicitud', esc(s.tipo))}
+          ${field('Días solicitados', s.dias)}
+          ${field('Fecha de inicio', fmt(s.fechaInicio))}
+          ${field('Fecha de fin', fmt(s.fechaFin))}
+          ${field('Fecha de solicitud', fmt(s.fechaSolicitud))}
+          ${field('Resuelto por', esc(s.resueltoPor || 'Pendiente de revisión'))}
+        </div>
+        <div>
+          <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">Motivo</p>
+          <p class="text-sm text-slate-700 mt-0.5 bg-slate-50 border border-slate-200 rounded-lg p-3">${esc(s.motivo || '—')}</p>
+        </div>
+        ${s.comentario ? `<div>
+          <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">Comentario de resolución</p>
+          <p class="text-sm text-slate-700 mt-0.5 bg-slate-50 border border-slate-200 rounded-lg p-3">${esc(s.comentario)}</p>
+        </div>` : ''}
+        ${s.tipo === 'Vacaciones' ? `<div class="bg-corp-50 border border-corp-200 rounded-lg p-3 text-xs text-corp-700">
+          Saldo actual del colaborador: <strong>${saldoVacaciones(emp)} días disponibles</strong> de ${emp?.vacacionesAsignadas || 0} asignados.
+        </div>` : ''}
+      </div>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cerrar</button>`
+    });
+  },
+  aprobarSol: el => resolverSolicitud(el.dataset.id, 'Aprobado'),
+  rechazarSol: el => resolverSolicitud(el.dataset.id, 'Rechazado'),
+  delSol: el => {
+    const s = DB.solicitudes.find(x => x.id === el.dataset.id);
+    if (!s) return;
+    DB.solicitudes = DB.solicitudes.filter(x => x.id !== el.dataset.id);
+    log('SOLICITUD_ELIMINADA', `Solicitud ${s.id} de ${nombreEmp(s.empleadoId)} eliminada.`);
+    saveDB(); render(); toast('Solicitud eliminada.', 'ok');
+  },
+
+  /* --- Talento --- */
+  talTab: el => { state.talTab = el.dataset.tab; render(); },
+  candEstado: el => {
+    const c = getCand(el.dataset.id);
+    if (!c) return;
+    const prev = c.estado;
+    c.estado = el.value;
+    log('CANDIDATO_ESTADO', `${c.nombre}: ${prev} → ${c.estado}.`);
+    saveDB();
+    toast(`Estado actualizado a "${c.estado}".`, 'ok');
+  },
+  newCand: () => modalCandidato(),
+  verCand: el => {
+    const c = getCand(el.dataset.id);
+    if (!c) return;
+    openModal({
+      title: `Candidato: ${esc(c.nombre)}`,
+      body: `<div class="space-y-4">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-xl ${avatarColor(c.nombre)} text-white grid place-items-center font-bold text-xl">${initials(c.nombre)}</div>
+          <div>
+            <p class="font-bold text-slate-800">${esc(c.nombre)}</p>
+            <p class="text-sm text-slate-500">${esc(c.puesto)}</p>
+            <div class="mt-1">${badge(c.estado)}</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${field('Correo electrónico', esc(c.email))}
+          ${field('Teléfono', esc(c.telefono))}
+          ${field('Fuente de reclutamiento', esc(c.fuente))}
+          ${field('Fecha de registro', fmt(c.fechaRegistro))}
+          ${field('Años de experiencia', (c.experiencia || 0) + ' años')}
+          ${field('Formación académica', esc(c.educacion))}
+        </div>
+        <div>
+          <p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1.5">Habilidades</p>
+          <div class="flex flex-wrap gap-1.5">
+            ${(c.habilidades || []).length ? c.habilidades.map(h => `<span class="text-xs px-2.5 py-1 rounded-full bg-corp-50 text-corp-700 ring-1 ring-corp-200 font-medium">${esc(h)}</span>`).join('') : '<span class="text-sm text-slate-400">No registradas</span>'}
+          </div>
+        </div>
+        ${c.notas ? `<div><p class="text-[11px] uppercase tracking-wide text-slate-400 font-semibold">Notas</p><p class="text-sm text-slate-700 mt-0.5">${esc(c.notas)}</p></div>` : ''}
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-rose-50 text-rose-600 grid place-items-center text-[10px] font-black shrink-0">PDF</div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-slate-700 truncate">${esc(c.cvNombre || 'CV no adjunto')}</p>
+            <p class="text-[11px] text-slate-400">Documento de respaldo del candidato</p>
+          </div>
+        </div>
+      </div>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cerrar</button>`
+    });
+  },
+  delCand: el => {
+    const c = getCand(el.dataset.id);
+    if (!c) return;
+    DB.candidatos = DB.candidatos.filter(x => x.id !== el.dataset.id);
+    log('CANDIDATO_ELIMINADO', `Candidato ${c.nombre} eliminado del banco.`);
+    saveDB(); render(); toast('Candidato eliminado.', 'ok');
+  },
+  gotoBulk: () => { state.view = 'herramientas'; render(); setTimeout(() => document.getElementById('bulkInput')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200); },
+
+  /* --- Políticas --- */
+  polToggle: el => {
+    const id = el.dataset.id;
+    state.polOpen = state.polOpen === id ? null : id;
+    document.getElementById('polList').innerHTML = listaPoliticas();
+  },
+  firmarPol: el => {
+    const p = DB.politicas.find(x => x.id === el.dataset.id);
+    if (!p) return;
+    p.conformidades = p.conformidades || [];
+    const faltan = DB.empleados.filter(e => !p.conformidades.some(f => f.empleadoId === e.id));
+    if (!faltan.length) { toast('Todos los colaboradores ya confirmaron la lectura.', 'info'); return; }
+    openModal({
+      title: 'Confirmar lectura y conformidad',
+      body: `<div class="space-y-4">
+        <p class="text-sm text-slate-600">Registre la confirmación de lectura de <strong>${esc(p.titulo)}</strong> (${esc(p.version)}).</p>
+        ${formRow('Colaborador', `<select id="firmEmp" class="${INPUT_CLS}">${faltan.map(e => `<option value="${e.id}">${esc(e.nombre)} ${esc(e.apellidos)} — ${esc(e.puesto)}</option>`).join('')}</select>`)}
+        <label class="flex items-start gap-3 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-3">
+          <input type="checkbox" id="firmAcepto" class="mt-0.5 rounded">
+          <span>El colaborador declara haber leído y comprendido el documento y acepta cumplir con lo establecido en él. El sistema registrará fecha, hora y usuario en la bitácora de auditoría.</span>
+        </label>
+      </div>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+               <button id="btnFirmar" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition">Registrar conformidad</button>`
+    });
+    document.getElementById('btnFirmar').onclick = () => {
+      if (!document.getElementById('firmAcepto').checked) { toast('Debe marcar la casilla de aceptación.', 'warn'); return; }
+      const empId = v('firmEmp');
+      p.conformidades.push({ empleadoId: empId, fecha: new Date().toISOString() });
+      log('CONFORMIDAD_POLITICA', `${nombreEmp(empId)} confirmó lectura de "${p.titulo}" (${p.version}).`);
+      saveDB(); closeModal(); render();
+      toast('Conformidad registrada correctamente.', 'ok');
+    };
+  },
+
+  /* --- Herramientas --- */
+  exportJSON: () => exportarJSON(),
+  exportCSVemp: () => exportarEmpleadosCSV(),
+  exportCSVsol: () => exportarSolicitudesCSV(),
+  exportLog: () => {
+    const headers = ['fecha','usuario','accion','detalle'];
+    download(`Talent360_Auditoria_${hoy()}.csv`, toCSV(headers, DB.auditoria.map(l => [l.fecha, l.usuario, l.accion, l.detalle])), 'text/csv');
+    toast('Bitácora exportada.', 'ok');
+  },
+  resetDB: () => {
+    openModal({
+      title: '⚠️ Restablecer datos de demostración',
+      body: `<p class="text-sm text-slate-600">Esta acción eliminará <strong>toda la información actual</strong> y restaurará la base de datos de demostración original. Se recomienda exportar un respaldo JSON antes de continuar.</p>
+             <p class="text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-3 mt-3">Acción irreversible.</p>`,
+      footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+               <button id="btnReset" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white transition">Restablecer</button>`
+    });
+    document.getElementById('btnReset').onclick = () => {
+      DB = seedDB();
+      state.empSel = null; state.polOpen = null; state.bulk = null;
+      saveDB(); closeModal(); render();
+      toast('Datos de demostración restablecidos.', 'ok');
+    };
+  }
+};
+
+/* --- Resolver solicitud --- */
+function resolverSolicitud(id, estado) {
+  const s = DB.solicitudes.find(x => x.id === id);
+  if (!s) return;
+  const emp = getEmp(s.empleadoId);
+
+  openModal({
+    title: estado === 'Aprobado' ? '✅ Aprobar solicitud' : '⛔ Rechazar solicitud',
+    body: `<div class="space-y-4">
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+        <p class="text-sm font-semibold text-slate-700">${esc(nombreEmp(s.empleadoId))}</p>
+        <p class="text-xs text-slate-500 mt-1">${esc(s.tipo)} · ${fmt(s.fechaInicio)} → ${fmt(s.fechaFin)} · <strong>${s.dias} día(s)</strong></p>
+        <p class="text-xs text-slate-500 mt-2">${esc(s.motivo || '')}</p>
+      </div>
+      ${s.tipo === 'Vacaciones' && estado === 'Aprobado' ? `
+        <div class="text-xs rounded-lg p-3 ${saldoVacaciones(emp) >= s.dias ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+          Saldo disponible: <strong>${saldoVacaciones(emp)} días</strong>. ${saldoVacaciones(emp) >= s.dias ? 'Suficiente para aprobar la solicitud.' : '⚠️ Insuficiente para cubrir los días solicitados.'}
+        </div>` : ''}
+      ${formRow('Comentario de resolución (opcional)', `<textarea id="solComent" rows="3" class="${INPUT_CLS}" placeholder="Observaciones, condiciones o justificación…"></textarea>`)}
+      ${formRow('Resuelto por', `<input id="solPor" class="${INPUT_CLS}" value="admin@itcpo.com">`)}
+    </div>`,
+    footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+             <button id="btnResolver" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition ${estado === 'Aprobado' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'}">
+               ${estado === 'Aprobado' ? 'Confirmar aprobación' : 'Confirmar rechazo'}
+             </button>`
+  });
+
+  document.getElementById('btnResolver').onclick = () => {
+    s.estado = estado;
+    s.comentario = v('solComent');
+    s.resueltoPor = v('solPor') || 'admin@itcpo.com';
+    log('SOLICITUD_' + estado.toUpperCase(), `Solicitud ${s.id} (${s.tipo}) de ${nombreEmp(s.empleadoId)}: ${estado}.`);
+    saveDB(); closeModal(); render();
+    toast(`Solicitud ${estado.toLowerCase()} correctamente.`, estado === 'Aprobado' ? 'ok' : 'warn');
+  };
+}
+
+/* --- Modal de empleado --- */
+function modalEmpleado(id) {
+  const e = id ? getEmp(id) : null;
+  const d = e || { departamento: '', estado: 'Activo', tipoContrato: 'Indefinido', vacacionesAsignadas: 15 };
+  openModal({
+    title: e ? `✏️ Editar: ${esc(e.nombre)} ${esc(e.apellidos)}` : '👤 Nuevo colaborador',
+    size: 'max-w-3xl',
+    body: `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      ${formRow('Nombre(s) *', `<input id="f_nombre" class="${INPUT_CLS}" value="${esc(d.nombre || '')}" placeholder="Ej. Ana Lucía">`)}
+      ${formRow('Apellidos *', `<input id="f_apellidos" class="${INPUT_CLS}" value="${esc(d.apellidos || '')}" placeholder="Ej. Morales Vega">`)}
+      ${formRow('Correo corporativo *', `<input id="f_email" type="email" class="${INPUT_CLS}" value="${esc(d.email || '')}" placeholder="nombre@itcpo.com">`)}
+      ${formRow('Teléfono', `<input id="f_telefono" class="${INPUT_CLS}" value="${esc(d.telefono || '')}" placeholder="+503 0000-0000">`)}
+      ${formRow('Fecha de nacimiento', `<input id="f_nacimiento" type="date" class="${INPUT_CLS}" value="${esc(d.fechaNacimiento || '')}">`)}
+      ${formRow('Género', `<select id="f_genero" class="${INPUT_CLS}">
+        ${['', 'Femenino', 'Masculino', 'Otro', 'Prefiero no indicar'].map(g => `<option ${d.genero === g ? 'selected' : ''}>${g}</option>`).join('')}
+      </select>`)}
+      ${formRow('DUI', `<input id="f_dui" class="${INPUT_CLS}" value="${esc(d.dui || '')}" placeholder="0000-000000-000-0">`)}
+      ${formRow('NIT', `<input id="f_nit" class="${INPUT_CLS}" value="${esc(d.nit || '')}" placeholder="0000-000000-000-0">`)}
+      ${formRow('Dirección', `<input id="f_direccion" class="${INPUT_CLS}" value="${esc(d.direccion || '')}">`, 2)}
+      ${formRow('Nivel académico', `<input id="f_nivel" class="${INPUT_CLS}" value="${esc(d.nivelAcademico || '')}" placeholder="Ej. Lic. en Administración">`)}
+      ${formRow('Departamento *', `<input id="f_depto" class="${INPUT_CLS}" value="${esc(d.departamento || '')}" list="deptoList" placeholder="Ej. Recursos Humanos">
+        <datalist id="deptoList">${departamentos().map(x => `<option value="${esc(x)}">`).join('')}</datalist>`)}
+      ${formRow('Puesto *', `<input id="f_puesto" class="${INPUT_CLS}" value="${esc(d.puesto || '')}" placeholder="Ej. Analista Contable">`)}
+      ${formRow('Jefe inmediato', `<input id="f_jefe" class="${INPUT_CLS}" value="${esc(d.jefe || '')}">`)}
+      ${formRow('Fecha de ingreso *', `<input id="f_ingreso" type="date" class="${INPUT_CLS}" value="${esc(d.fechaIngreso || hoy())}">`)}
+      ${formRow('Tipo de contrato', `<select id="f_contrato" class="${INPUT_CLS}">
+        ${['Indefinido', 'Plazo fijo', 'Por obra', 'Servicios profesionales', 'Pasantía'].map(c => `<option ${d.tipoContrato === c ? 'selected' : ''}>${c}</option>`).join('')}
+      </select>`)}
+      ${formRow('Salario base (USD)', `<input id="f_salario" type="number" step="0.01" min="0" class="${INPUT_CLS}" value="${esc(d.salario || '')}">`)}
+      ${formRow('Días de vacaciones asignados', `<input id="f_vac" type="number" min="0" class="${INPUT_CLS}" value="${esc(d.vacacionesAsignadas ?? 15)}">`)}
+      ${formRow('Estado', `<select id="f_estado" class="${INPUT_CLS}">
+        ${['Activo', 'Inactivo'].map(s => `<option ${d.estado === s ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>`)}
+    </div>`,
+    footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+             <button id="btnSaveEmp" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-accent-500 hover:bg-accent-600 text-white transition">${e ? 'Guardar cambios' : 'Crear colaborador'}</button>`
+  });
+
+  document.getElementById('btnSaveEmp').onclick = () => {
+    const nombre = v('f_nombre'), apellidos = v('f_apellidos'), email = v('f_email'),
+          depto = v('f_depto'), puesto = v('f_puesto'), ingreso = v('f_ingreso');
+    if (!nombre || !apellidos || !email || !depto || !puesto || !ingreso) {
+      toast('Complete los campos obligatorios (*).', 'warn'); return;
+    }
+    if (DB.empleados.some(x => x.email.toLowerCase() === email.toLowerCase() && x.id !== (e?.id))) {
+      toast('Ya existe un colaborador con ese correo.', 'err'); return;
+    }
+    const datos = {
+      nombre, apellidos, email,
+      telefono: v('f_telefono'), fechaNacimiento: v('f_nacimiento'), genero: v('f_genero'),
+      dui: v('f_dui'), nit: v('f_nit'), direccion: v('f_direccion'), nivelAcademico: v('f_nivel'),
+      departamento: depto, puesto, jefe: v('f_jefe'), fechaIngreso: ingreso,
+      tipoContrato: v('f_contrato'), salario: num('f_salario'),
+      vacacionesAsignadas: parseInt(v('f_vac'), 10) || 0, estado: v('f_estado')
+    };
+    if (e) {
+      Object.assign(e, datos);
+      log('EMPLEADO_ACTUALIZADO', `Expediente de ${nombre} ${apellidos} (${e.id}) actualizado.`);
+    } else {
+      const nuevo = {
+        id: 'EMP-' + String(DB.empleados.length + 1).padStart(4, '0'),
+        ...datos, vacacionesTomadas: 0,
+        documentos: [], capacitaciones: [], competencias: []
+      };
+      DB.empleados.push(nuevo);
+      log('EMPLEADO_CREADO', `${nombre} ${apellidos} (${nuevo.id}) registrado en ${depto}.`);
+    }
+    saveDB(); closeModal(); render();
+    toast(e ? 'Expediente actualizado.' : 'Colaborador registrado.', 'ok');
+  };
+}
+
+/* --- Modal de solicitud --- */
+function modalSolicitud() {
+  openModal({
+    title: '📝 Nueva solicitud de autoservicio',
+    size: 'max-w-2xl',
+    body: `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      ${formRow('Colaborador *', `<select id="s_emp" class="${INPUT_CLS}" onchange="actualizarSaldo()">
+        <option value="">— Seleccione —</option>
+        ${DB.empleados.map(e => `<option value="${e.id}" ${state.empSel === e.id ? 'selected' : ''}>${esc(e.nombre)} ${esc(e.apellidos)} · ${esc(e.departamento)}</option>`).join('')}
+      </select>`, 2)}
+      <div class="md:col-span-2 hidden" id="saldoBox"></div>
+      ${formRow('Tipo de solicitud *', `<select id="s_tipo" class="${INPUT_CLS}">${TIPOS_SOLICITUD.map(t => `<option>${t}</option>`).join('')}</select>`)}
+      ${formRow('Días solicitados', `<input id="s_dias" class="${INPUT_CLS} bg-slate-50" readonly value="1">`)}
+      ${formRow('Fecha de inicio *', `<input id="s_ini" type="date" value="${hoy()}" class="${INPUT_CLS}" onchange="calcularDias()">`)}
+      ${formRow('Fecha de fin *', `<input id="s_fin" type="date" value="${hoy()}" class="${INPUT_CLS}" onchange="calcularDias()">`)}
+      ${formRow('Motivo / justificación *', `<textarea id="s_motivo" rows="3" class="${INPUT_CLS}" placeholder="Describa el motivo de la solicitud…"></textarea>`, 2)}
+    </div>`,
+    footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+             <button id="btnSaveSol" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-accent-500 hover:bg-accent-600 text-white transition">Enviar solicitud</button>`
+  });
+  window.actualizarSaldo = () => {
+    const emp = getEmp(v('s_emp'));
+    const box = document.getElementById('saldoBox');
+    if (!emp || !box) { if (box) box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    box.innerHTML = `<div class="bg-corp-50 border border-corp-200 rounded-lg p-3 text-xs text-corp-700 grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <span><strong>Asignados:</strong> ${emp.vacacionesAsignadas || 0}</span>
+      <span><strong>Aprobados:</strong> ${(emp.vacacionesAsignadas || 0) - saldoVacaciones(emp)}</span>
+      <span><strong>Disponibles:</strong> <span class="font-bold">${saldoVacaciones(emp)}</span></span>
+      <span><strong>Departamento:</strong> ${esc(emp.departamento)}</span>
+    </div>`;
+  };
+  window.calcularDias = () => {
+    const d = diasEntre(v('s_ini'), v('s_fin'));
+    const el = document.getElementById('s_dias');
+    if (el) el.value = d;
+  };
+  if (state.empSel) window.actualizarSaldo();
+
+  document.getElementById('btnSaveSol').onclick = () => {
+    const empId = v('s_emp'), ini = v('s_ini'), fin = v('s_fin'), motivo = v('s_motivo');
+    if (!empId) { toast('Seleccione un colaborador.', 'warn'); return; }
+    if (!ini || !fin) { toast('Indique las fechas de inicio y fin.', 'warn'); return; }
+    if (new Date(fin) < new Date(ini)) { toast('La fecha de fin no puede ser anterior a la de inicio.', 'err'); return; }
+    if (!motivo) { toast('Describa el motivo de la solicitud.', 'warn'); return; }
+    const dias = diasEntre(ini, fin);
+    const tipo = v('s_tipo');
+    const emp = getEmp(empId);
+    if (tipo === 'Vacaciones' && dias > saldoVacaciones(emp)) {
+      toast(`Saldo insuficiente: ${saldoVacaciones(emp)} días disponibles y se solicitan ${dias}.`, 'err');
+      return;
+    }
+    const s = {
+      id: 'SOL-' + String(DB.solicitudes.length + 1).padStart(4, '0'),
+      empleadoId: empId, tipo, fechaInicio: ini, fechaFin: fin, dias,
+      motivo, estado: 'Pendiente', fechaSolicitud: hoy(), resueltoPor: '', comentario: ''
+    };
+    DB.solicitudes.unshift(s);
+    log('SOLICITUD_CREADA', `${tipo} de ${dias} día(s) creada para ${nombreEmp(empId)} (${s.id}).`);
+    saveDB(); closeModal(); render();
+    toast('Solicitud enviada. Estado: Pendiente de aprobación.', 'ok');
+  };
+}
+
+/* --- Modal de candidato --- */
+function modalCandidato() {
+  openModal({
+    title: '👤 Nuevo candidato externo',
+    size: 'max-w-2xl',
+    body: `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      ${formRow('Nombre completo *', `<input id="c_nombre" class="${INPUT_CLS}" placeholder="Ej. Roberto Carlos Méndez Ayala">`, 2)}
+      ${formRow('Correo electrónico *', `<input id="c_email" type="email" class="${INPUT_CLS}" placeholder="correo@dominio.com">`)}
+      ${formRow('Teléfono', `<input id="c_tel" class="${INPUT_CLS}" placeholder="+503 0000-0000">`)}
+      ${formRow('Puesto al que aplica *', `<input id="c_puesto" class="${INPUT_CLS}" placeholder="Ej. Analista de Datos">`)}
+      ${formRow('Fuente de reclutamiento', `<select id="c_fuente" class="${INPUT_CLS}">
+        ${['LinkedIn','Portal Web','Referido interno','Feria de empleo','Bolsa de trabajo','Otro'].map(f => `<option>${f}</option>`).join('')}
+      </select>`)}
+      ${formRow('Años de experiencia', `<input id="c_exp" type="number" min="0" value="0" class="${INPUT_CLS}">`)}
+      ${formRow('Formación académica', `<input id="c_edu" class="${INPUT_CLS}" placeholder="Ej. Lic. en Administración">`)}
+      ${formRow('Habilidades (separadas por ;)', `<input id="c_hab" class="${INPUT_CLS}" placeholder="SQL; Power BI; Python">`, 2)}
+      ${formRow('Estado de reclutamiento', `<select id="c_estado" class="${INPUT_CLS}">
+        ${['En Revisión','Entrevista','Contratado','Descartado'].map(s => `<option>${s}</option>`).join('')}
+      </select>`)}
+      ${formRow('Notas internas', `<input id="c_notas" class="${INPUT_CLS}" placeholder="Observaciones del proceso">`)}
+    </div>`,
+    footer: `<button data-act="closeModal" class="px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition">Cancelar</button>
+             <button id="btnSaveCand" class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-accent-500 hover:bg-accent-600 text-white transition">Registrar candidato</button>`
+  });
+  document.getElementById('btnSaveCand').onclick = () => {
+    const nombre = v('c_nombre'), email = v('c_email'), puesto = v('c_puesto');
+    if (!nombre || !email || !puesto) { toast('Complete los campos obligatorios (*).', 'warn'); return; }
+    const c = {
+      id: uid('CAN'), nombre, email, telefono: v('c_tel'), puesto,
+      fuente: v('c_fuente'), estado: v('c_estado'),
+      habilidades: v('c_hab').split(';').map(s => s.trim()).filter(Boolean),
+      experiencia: parseInt(v('c_exp'), 10) || 0, educacion: v('c_edu'),
+      cvNombre: '', fechaRegistro: hoy(), notas: v('c_notas')
+    };
+    DB.candidatos.unshift(c);
+    log('CANDIDATO_CREADO', `${nombre} registrado para el puesto "${puesto}".`);
+    saveDB(); closeModal(); render();
+    toast('Candidato registrado en el banco.', 'ok');
+  };
+}
+
+/* =========================================================================
+   EVENTOS GLOBALES
+   ========================================================================= */
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act;
+  const fn = ACTIONS[act];
+  if (fn) { ev.preventDefault(); fn(el, ev); }
+});
+
+document.addEventListener('change', ev => {
+  const el = ev.target.closest('select[data-act="candEstado"]');
+  if (el) ACTIONS.candEstado(el);
+});
+
+/* Sidebar móvil */
+function closeSidebar() {
+  if (window.innerWidth < 1024) {
+    $('#sidebar').classList.add('-translate-x-full');
+    $('#overlay').classList.add('hidden');
+  }
+}
+$('#btnMenu').addEventListener('click', () => {
+  $('#sidebar').classList.toggle('-translate-x-full');
+  $('#overlay').classList.toggle('hidden');
+});
+$('#overlay').addEventListener('click', closeSidebar);
+
+/* =========================================================================
+   INICIALIZACIÓN
+   ========================================================================= */
+(function init() {
+  DB = loadDB();
+  if (!DB) {
+    DB = seedDB();
+    saveDB();
+    setTimeout(() => toast('Bienvenido a Talent360 Hub. Se cargaron datos de demostración.', 'info'), 600);
+  }
+  render();
+  console.log('%cTalent360 Hub','color:#f97316;font-weight:bold;font-size:14px','\n© 2026 Carlos Alfredo Castillo Flores — ITCPO. Todos los derechos reservados.');
+})();
+</script>
+</body>
 </html>
